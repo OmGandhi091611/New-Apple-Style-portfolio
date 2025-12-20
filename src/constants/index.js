@@ -330,13 +330,13 @@ export const MUSIC_TRACKS = [
     id: "t1",
     title: "Dhurandhar - Title Track",
     artist: "Shashwat Sachdev, Hanumankind, Jasmine Sandlas",
-    src: "/audio/Dhurandhar - Title Track  Ranveer Singh, Shashwat Sachdev, Hanumankind, Jasmine Sandlas,Aditya Dhar",
+    src: "/audio/Dhurandhar - Title Track  Ranveer Singh, Shashwat Sachdev, Hanumankind, Jasmine Sandlas,Aditya Dhar.mp3",
   },
   {
     id: "t2",
     title: "Ishq Jalakar - Karvaan",
     artist: "Shashwat Sachdev",
-    src: "/audio/Ishq Jalakar - Karvaan  Dhurandhar  Ranveer Singh, Shashwat Sachdev, Aditya Dhar  Releasing 5 Dec",
+    src: "/audio/Ishq Jalakar - Karvaan  Dhurandhar  Ranveer Singh, Shashwat Sachdev, Aditya Dhar  Releasing 5 Dec.mp3",
   },
   {
     id: "t3",
@@ -348,6 +348,6 @@ export const MUSIC_TRACKS = [
     id: "t4",
     title: "Khaabon ke Parindey",
     artist: "Mohit chauhan, Alyssa Mendonsa",
-    src: "/audio/public/audio/Khaabon Ke Parinday (Full video song) Zindagi Na Milegi Dobara  Hrithik Roshan, Kartina Kaif.mp3",
+    src: "/audio/Khaabon Ke Parinday (Full video song) Zindagi Na Milegi Dobara  Hrithik Roshan, Kartina Kaif.mp3",
   },
 ];
