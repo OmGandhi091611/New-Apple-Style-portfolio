@@ -328,20 +328,26 @@ export const DOCK_EXTRAS = [
 export const MUSIC_TRACKS = [
   {
     id: "t1",
-    title: "Midnight Drive",
-    artist: "Om Gandhi",
-    src: "/audio/track1.mp3",
+    title: "Dhurandhar - Title Track",
+    artist: "Shashwat Sachdev, Hanumankind, Jasmine Sandlas",
+    src: "/audio/Dhurandhar - Title Track  Ranveer Singh, Shashwat Sachdev, Hanumankind, Jasmine Sandlas,Aditya Dhar",
   },
   {
     id: "t2",
-    title: "Lo-Fi Study",
-    artist: "Om Gandhi",
-    src: "/audio/track2.mp3",
+    title: "Ishq Jalakar - Karvaan",
+    artist: "Shashwat Sachdev",
+    src: "/audio/Ishq Jalakar - Karvaan  Dhurandhar  Ranveer Singh, Shashwat Sachdev, Aditya Dhar  Releasing 5 Dec",
   },
   {
     id: "t3",
-    title: "Cloud Nights",
-    artist: "Om Gandhi",
-    src: "/audio/track3.mp3",
+    title: "Move - Yeh Ishq Ishq (From Dhurandhar)",
+    artist: "Shashwat Sachdev, Reble, Sonu Nigam, Roshan, Sahir Ludhianvi",
+    src: "/audio/Move - Yeh Ishq Ishq (From Dhurandhar).mp3",
+  },
+  {
+    id: "t4",
+    title: "Khaabon ke Parindey",
+    artist: "Mohit chauhan, Alyssa Mendonsa",
+    src: "/audio/public/audio/Khaabon Ke Parinday (Full video song) Zindagi Na Milegi Dobara  Hrithik Roshan, Kartina Kaif.mp3",
   },
 ];
