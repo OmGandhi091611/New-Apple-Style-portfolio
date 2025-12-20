@@ -160,12 +160,9 @@ export default function Navbar() {
   };
 
   // -----------------------------
-  // ✅ NAVBAR -> OPEN FINDER
+  // NAVBAR -> OPEN FINDER
   // -----------------------------
   const handleNavClick = (link) => {
-    // Expect constants like:
-    // { name:"Projects", type:"finder", section:"projects" }
-    // { name:"Resume", type:"resume" }
     const type = link.type;
     const section = link.section;
 
@@ -175,6 +172,13 @@ export default function Navbar() {
       })
     );
   };
+
+  // (Optional) keep time ticking in mobile status bar
+  const [, forceTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => forceTick((x) => x + 1), 1000 * 30);
+    return () => clearInterval(id);
+  }, []);
 
   return (
     <>
@@ -271,6 +275,7 @@ export default function Navbar() {
           </div>
         </div>
 
+        {/* Swipe zone */}
         <div className="absolute top-0 right-0 h-16 w-32">
           <div
             className="h-full w-full"
@@ -284,7 +289,13 @@ export default function Navbar() {
       </div>
 
       {/* Mobile Control Center overlay */}
-      <ControlCenter open={ccOpen} onClose={closeCC} closedY={CLOSED_Y} openY={OPEN_Y} yExternal={ccY} />
+      <ControlCenter
+        open={ccOpen}
+        onClose={closeCC}
+        closedY={CLOSED_Y}
+        openY={OPEN_Y}
+        yExternal={ccY}
+      />
     </>
   );
 }
