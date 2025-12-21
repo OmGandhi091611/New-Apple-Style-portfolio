@@ -20,6 +20,9 @@ import {
 } from "lucide-react";
 import { MUSIC_TRACKS } from "#constants";
 
+// ✅ shared audio (same as mobile)
+import { subscribeAudio, audioActions } from "../lib/audioController";
+
 function clamp(n, min, max) {
   return Math.max(min, Math.min(max, n));
 }
@@ -58,166 +61,51 @@ export default function DesktopControlCenter({ open, anchorRect, onRequestClose 
   const [camOn, setCamOn] = useState(false);
   const [focusOn, setFocusOn] = useState(false);
 
+  // Keep brightness local but apply to CSS var (your App overlay uses this)
   const [brightness, setBrightness] = useState(0.85);
-  const [volume, setVolume] = useState(0.55);
 
+  // ✅ shared audio state
+  const [audioState, setAudioState] = useState(() => ({
+    tracks: [],
+    index: 0,
+    playing: false,
+    currentTime: 0,
+    duration: 0,
+    volume: 0.55,
+    error: "",
+  }));
+
+  // ✅ initialize tracks into shared controller (so changes in constants reflect)
   useEffect(() => {
-    const v = clamp(brightness, 0.25, 1.25);
-    document.documentElement.style.setProperty("--ui-brightness", String(v));
-    return () => document.documentElement.style.removeProperty("--ui-brightness");
-  }, [brightness]);
+    audioActions.initTracks(MUSIC_TRACKS);
+  }, [MUSIC_TRACKS]);
 
-  // Audio
-  const tracks = useMemo(() => (Array.isArray(MUSIC_TRACKS) ? MUSIC_TRACKS : []), []);
-  const [trackIndex, setTrackIndex] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const [audioError, setAudioError] = useState("");
-
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-
-  const audioRef = useRef(null);
-
-  const activeTrack = tracks.length ? tracks[clamp(trackIndex, 0, tracks.length - 1)] : null;
-
+  // ✅ subscribe to shared audio updates
   useEffect(() => {
-    const a = audioRef.current;
-    if (!a) return;
-    a.volume = clamp(volume, 0, 1);
-  }, [volume]);
-
-  useEffect(() => {
-    const a = audioRef.current;
-    if (!a) return;
-
-    const onPlay = () => setPlaying(true);
-    const onPause = () => setPlaying(false);
-    const onTime = () => setCurrentTime(a.currentTime || 0);
-    const onMeta = () => setDuration(a.duration || 0);
-    const onError = () => {
-      const code = a?.error?.code;
-      setAudioError(
-        `Audio not supported / not found${code ? ` (code ${code})` : ""}: ${a?.src || ""}`
-      );
-      setPlaying(false);
-    };
-
-    a.addEventListener("play", onPlay);
-    a.addEventListener("pause", onPause);
-    a.addEventListener("timeupdate", onTime);
-    a.addEventListener("loadedmetadata", onMeta);
-    a.addEventListener("durationchange", onMeta);
-    a.addEventListener("error", onError);
-
-    return () => {
-      a.removeEventListener("play", onPlay);
-      a.removeEventListener("pause", onPause);
-      a.removeEventListener("timeupdate", onTime);
-      a.removeEventListener("loadedmetadata", onMeta);
-      a.removeEventListener("durationchange", onMeta);
-      a.removeEventListener("error", onError);
-    };
+    const unsub = subscribeAudio(setAudioState);
+    return unsub;
   }, []);
 
-  // initial src once
+  // ✅ brightness var for overlay; keep it 0..1 because your overlay does calc(1 - brightness)
   useEffect(() => {
-    const a = audioRef.current;
-    if (!a) return;
-    if (!activeTrack?.src) return;
-    if (a.src && a.src.endsWith(activeTrack.src)) return;
-    a.src = activeTrack.src;
-    setAudioError("");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tracks.length]);
+    const v = clamp(brightness, 0, 1);
+    document.documentElement.style.setProperty("--ui-brightness", String(v));
+    // IMPORTANT: do NOT remove on unmount; otherwise mobile/desktop popovers will "reset" it
+  }, [brightness]);
 
-  const play = async () => {
-    const a = audioRef.current;
-    if (!a || !a.src) return;
-    try {
-      setAudioError("");
-      await a.play();
-      setPlaying(true);
-    } catch (e) {
-      console.error("Audio play failed:", e);
-      setPlaying(false);
-    }
-  };
+  const activeTrack = useMemo(() => {
+    const t = audioState.tracks?.[audioState.index];
+    return t || null;
+  }, [audioState.tracks, audioState.index]);
 
-  const pause = () => {
-    const a = audioRef.current;
-    if (!a) return;
-    a.pause();
-    setPlaying(false);
-  };
-
-  const togglePlay = async () => {
-    const a = audioRef.current;
-    if (!a || !a.src) return;
-    if (!a.paused) pause();
-    else await play();
-  };
-
-  const switchToIndex = async (newIndex, forcePlay = true) => {
-    if (!tracks.length) return;
-    const a = audioRef.current;
-    if (!a) return;
-
-    const next = ((newIndex % tracks.length) + tracks.length) % tracks.length;
-    const nextSrc = tracks[next]?.src;
-    if (!nextSrc) return;
-
-    setAudioError("");
-
-    a.pause();
-    a.currentTime = 0;
-    setCurrentTime(0);
-    setDuration(0);
-
-    a.src = nextSrc;
-    setTrackIndex(next);
-
-    if (!forcePlay) {
-      setPlaying(false);
-      return;
-    }
-
-    try {
-      await a.play();
-      setPlaying(true);
-    } catch (e) {
-      console.error("Audio play failed:", e);
-      setPlaying(false);
-    }
-  };
-
-  const nextTrack = async () => switchToIndex(trackIndex + 1, true);
-  const prevTrack = async () => switchToIndex(trackIndex - 1, true);
-
-  useEffect(() => {
-    const a = audioRef.current;
-    if (!a) return;
-    const onEnded = () => switchToIndex(trackIndex + 1, true);
-    a.addEventListener("ended", onEnded);
-    return () => a.removeEventListener("ended", onEnded);
-  }, [trackIndex]); // ok
-
-  const seekTo = (t) => {
-    const a = audioRef.current;
-    if (!a) return;
-    const max = Number.isFinite(duration) ? duration : 0;
-    const next = clamp(t, 0, max);
-    a.currentTime = next;
-    setCurrentTime(next);
-  };
+  const safeDur = Math.max(0, audioState.duration || 0);
+  const safeCur = Math.min(audioState.currentTime || 0, safeDur);
 
   const cycleAirdrop = () => {
     setAirdropMode((m) =>
       m === "Everyone" ? "Contacts Only" : m === "Contacts Only" ? "Off" : "Everyone"
     );
   };
-
-  const safeDur = Math.max(0, duration || 0);
-  const safeCur = Math.min(currentTime || 0, safeDur);
 
   return (
     <>
@@ -248,8 +136,6 @@ export default function DesktopControlCenter({ open, anchorRect, onRequestClose 
         ].join(" ")}
         onMouseDown={(e) => e.stopPropagation()}
       >
-        <audio ref={audioRef} preload="metadata" playsInline />
-
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-3">
             <MacPill
@@ -282,16 +168,21 @@ export default function DesktopControlCenter({ open, anchorRect, onRequestClose 
             <NowPlaying
               title={activeTrack?.title || "No Track"}
               subtitle={activeTrack?.artist || "Add /public/audio/*.mp3"}
-              playing={playing}
-              onPrev={prevTrack}
-              onNext={nextTrack}
-              onToggle={togglePlay}
-              disabled={!tracks.length}
+              playing={!!audioState.playing}
+              onPrev={audioActions.prev}
+              onNext={audioActions.next}
+              onToggle={audioActions.togglePlay}
+              disabled={!audioState.tracks?.length}
             />
 
-            {/* ✅ desktop progress bar */}
+            {/* ✅ desktop progress bar now uses shared currentTime/duration */}
             <div className="rounded-[24px] border border-white/12 bg-white/10 p-3">
-              <SeekBar value={safeCur} max={safeDur} disabled={!tracks.length} onChange={seekTo} />
+              <SeekBar
+                value={safeCur}
+                max={safeDur}
+                disabled={!audioState.tracks?.length || !safeDur}
+                onChange={(t) => audioActions.seekTo(t)}
+              />
               <div className="mt-1 flex items-center justify-between text-[11px] text-white/55">
                 <span>{fmtTime(safeCur)}</span>
                 <span>{fmtTime(safeDur)}</span>
@@ -357,14 +248,20 @@ export default function DesktopControlCenter({ open, anchorRect, onRequestClose 
           leftIcon={<Sun className="h-4 w-4 text-white/60" />}
           rightIcon={<Sun className="h-5 w-5 text-white/85" />}
           value={brightness}
-          onChange={setBrightness}
+          onChange={(v) => setBrightness(clamp(v, 0, 1))}
         />
 
+        {/* ✅ Sound uses shared volume */}
         <div className="mt-3 rounded-[22px] border border-white/12 bg-white/10 px-4 py-3 relative">
           <div className="text-[13px] font-semibold text-white/80 mb-2">Sound</div>
           <div className="flex items-center gap-3">
             <Volume2 className="h-4 w-4 text-white/60" />
-            <SeekBar value={volume} max={1} onChange={setVolume} />
+            <SeekBar
+              value={audioState.volume || 0}
+              max={1}
+              onChange={(v) => audioActions.setVolume(v)}
+              disabled={!audioState.tracks?.length}
+            />
             <Volume2 className="h-5 w-5 text-white/85" />
           </div>
 
@@ -389,7 +286,9 @@ export default function DesktopControlCenter({ open, anchorRect, onRequestClose 
           </button>
         </div>
 
-        {audioError ? <div className="mt-3 text-[11px] text-red-300 break-words">{audioError}</div> : null}
+        {audioState.error ? (
+          <div className="mt-3 text-[11px] text-red-300 break-words">{audioState.error}</div>
+        ) : null}
       </motion.div>
     </>
   );
