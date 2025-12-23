@@ -444,7 +444,7 @@ export const MUSIC_TRACKS = [
     id: "t20",
     title: "Nazaare Ho",
     artist: "Karthik Rao",
-    src: "/audio/Dice Media  Operation MBBS Season 2  Nazaare Ho  Music Video  Ayush, Anshul, Sarah Karthik Rao.mp3",
+    src: "/audio/Dice Media Nazaare Ho Music Video Ayush, Anshul, Sarah Karthik Rao.mp3",
   },
   {
     id: "t21",
