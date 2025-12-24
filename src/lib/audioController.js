@@ -8,9 +8,23 @@ const audio = new Audio();
 audio.preload = "metadata";
 audio.playsInline = true;
 
-let _volume = 0.55;
-audio.volume = _volume;
+// ---- WebAudio (for real volume control on iOS) ----
+let audioCtx = null;
+let mediaNode = null;
+let gainNode = null;
+let _webAudioReady = false;
 
+let _volume = 0.55;
+
+// IMPORTANT:
+// - On many browsers audio.volume works.
+// - On iOS Safari, audio.volume is constrained/ignored.
+// We’ll still set it, but the GainNode is the real control when available.
+try {
+  audio.volume = _volume;
+} catch {}
+
+// ---- Shared state ----
 let _state = {
   tracks: _tracks,
   index: _index,
@@ -39,7 +53,61 @@ function emit() {
   listeners.forEach((fn) => fn(_state));
 }
 
+/**
+ * Create WebAudio graph once:
+ * audio (media element) -> MediaElementSource -> GainNode -> destination
+ *
+ * NOTE: createMediaElementSource() can only be called once per <audio>.
+ */
+function ensureWebAudioGraph() {
+  if (_webAudioReady) return;
+
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+
+    audioCtx = audioCtx || new Ctx();
+
+    // Create nodes once
+    if (!mediaNode) mediaNode = audioCtx.createMediaElementSource(audio);
+    if (!gainNode) gainNode = audioCtx.createGain();
+
+    // Set initial gain to our volume
+    gainNode.gain.value = _volume;
+
+    // Connect graph only once
+    mediaNode.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    // When using gain node, keep element volume at 1 to avoid double scaling (where possible).
+    try {
+      audio.volume = 1;
+    } catch {}
+
+    _webAudioReady = true;
+  } catch (e) {
+    // If anything fails, we simply fall back to audio.volume.
+    console.warn("WebAudio volume not available, falling back:", e);
+    _webAudioReady = false;
+  }
+}
+
+/**
+ * iOS requires user gesture to start/resume AudioContext.
+ * Call this inside any user-initiated action: play/pause, next, prev, volume drag, etc.
+ */
+function unlockAudioContext() {
+  ensureWebAudioGraph();
+  if (!audioCtx) return;
+
+  if (audioCtx.state !== "running") {
+    audioCtx.resume().catch(() => {});
+  }
+}
+
 function safePlay() {
+  unlockAudioContext();
+
   const p = audio.play();
   if (p && typeof p.catch === "function") {
     p.catch((err) => {
@@ -130,7 +198,25 @@ function seekTo(t) {
 
 function setVolume(v) {
   _volume = clamp(v, 0, 1);
-  audio.volume = _volume;
+
+  // Make sure context is unlocked if user is dragging volume on iOS
+  unlockAudioContext();
+
+  // Prefer GainNode when available
+  if (_webAudioReady && gainNode && audioCtx) {
+    try {
+      // Smooth a bit to avoid clicks
+      gainNode.gain.setTargetAtTime(_volume, audioCtx.currentTime, 0.01);
+    } catch {
+      gainNode.gain.value = _volume;
+    }
+  } else {
+    // Fallback (works on desktop, often ignored on iOS)
+    try {
+      audio.volume = _volume;
+    } catch {}
+  }
+
   _state.volume = _volume;
   emit();
 }
@@ -214,4 +300,7 @@ export const audioActions = {
   seekTo,
   setVolume,
   setTrackIndex,
+
+  // Optional: if you want to call it explicitly on any first tap
+  unlock: unlockAudioContext,
 };
