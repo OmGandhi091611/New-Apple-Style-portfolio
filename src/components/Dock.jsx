@@ -64,7 +64,7 @@ export default function Dock({ items = [], iconRefs, pinnedCount = 5 }) {
   // ----- dock-managed music popup state -----
   const [musicOpen, setMusicOpen] = useState(false);
 
-  // ✅ NEW: unlock WebAudio once on the first user tap on Music
+  // ✅ unlock WebAudio once on first Music tap (helps iOS volume)
   const didUnlockRef = useRef(false);
 
   // Init tracks once
@@ -78,7 +78,7 @@ export default function Dock({ items = [], iconRefs, pinnedCount = 5 }) {
     return unsub;
   }, []);
 
-  // Close music popup on Esc
+  // Close music popup on Esc (desktop keyboards)
   useEffect(() => {
     if (!musicOpen) return;
     const onKey = (e) => {
@@ -88,13 +88,12 @@ export default function Dock({ items = [], iconRefs, pinnedCount = 5 }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [musicOpen]);
 
-  // If user didn't add a Music item in DOCK_APPS, inject one automatically
+  // Ensure a Music icon exists (inject if missing)
   const computedItems = useMemo(() => {
     const base = [...items];
     const hasMusic = base.some(isMusicItem);
 
     if (!hasMusic) {
-      // Insert near the front (after pinned apps zone) so it doesn't feel random
       base.splice(Math.min(base.length, pinnedCount), 0, {
         id: "music",
         type: "music",
@@ -125,7 +124,7 @@ export default function Dock({ items = [], iconRefs, pinnedCount = 5 }) {
     item?.onClick?.();
   };
 
-  // Mobile: keep your home screen + dock pill, no desktop icons grid.
+  // Mobile: home screen + dock pill, and centered popup
   if (isMobile) {
     const mobileItems = computedItems.filter((i) => !isTerminalItem(i));
     return (
@@ -133,7 +132,11 @@ export default function Dock({ items = [], iconRefs, pinnedCount = 5 }) {
         <MobileHomeScreen items={mobileItems} onItemClick={handleItemClick} iconRefs={iconRefs} />
 
         {musicOpen && (
-          <MusicPopup isMobile onClose={() => setMusicOpen(false)} audioState={audioState} />
+          <MusicPopup
+            isMobile
+            onClose={() => setMusicOpen(false)}
+            audioState={audioState}
+          />
         )}
 
         <MobileDockPill
@@ -146,10 +149,16 @@ export default function Dock({ items = [], iconRefs, pinnedCount = 5 }) {
     );
   }
 
-  // Desktop: ONLY the dock + centered popup
+  // Desktop: dock + centered popup
   return (
     <>
-      {musicOpen && <MusicPopup isMobile={false} onClose={() => setMusicOpen(false)} audioState={audioState} />}
+      {musicOpen && (
+        <MusicPopup
+          isMobile={false}
+          onClose={() => setMusicOpen(false)}
+          audioState={audioState}
+        />
+      )}
 
       <DesktopDock items={computedItems} iconRefs={iconRefs} onItemClick={handleItemClick} />
     </>
@@ -406,9 +415,9 @@ function MusicPopup({ isMobile, onClose, audioState }) {
       <div
         className={[
           "fixed z-[80]",
-          isMobile
-            ? "left-1/2 -translate-x-1/2 bottom-6 w-[min(560px,calc(100%-24px))]"
-            : "left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(520px,calc(100%-24px))]", // ✅ centered on desktop
+          // ✅ centered on BOTH mobile + desktop
+          "left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2",
+          isMobile ? "w-[min(560px,calc(100%-24px))]" : "w-[min(520px,calc(100%-24px))]",
         ].join(" ")}
         role="dialog"
         aria-label="Music player"
