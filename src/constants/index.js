@@ -528,7 +528,7 @@ export const MUSIC_TRACKS = [
     id: "t34",
     title: "Tum Jo Mil Gaye",
     artist: "Music",
-    src: "/audio/Tum Jo Mil Gaye - Bade Achhe Lagte Hain - Season 3  #RaYa #badeachhelagtehain3.mp3",
+    src: "/audio/Tum Jo Mil Gaye - Bade Achhe Lagte Hain - Season 3.mp3",
   },
   {
     id: "t35",
