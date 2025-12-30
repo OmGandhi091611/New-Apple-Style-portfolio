@@ -536,4 +536,22 @@ export const MUSIC_TRACKS = [
     artist: "Arijit Singh",
     src: "/audio/Wat Wat Wat FULL AUDIO Song  Tamasha  Ranbir Kapoor, Deepika Padukone  T-Series.mp3",
   },
+  {
+    id: "t36",
+    title: "Luka Chuppi Duniyaa",
+    artist: "Akhil Dhvani B",
+    src: "/audio/Luka Chuppi Duniyaa Full Video Song  Kartik Aaryan Kriti Sanon  Akhil  Dhvani B.mp3",
+  },
+  {
+    id: "t37",
+    title: "Kudmayi (Film Version)",
+    artist: "Pritam Amitabh",
+    src: "/audio/Kudmayi (Film Version)  Rocky Aur Rani Kii Prem Kahaani  Ranveer  Alia  Shahid  Pritam Amitabh.mp3",
+  },
+  {
+    id: "t38",
+    title: "Jab Tak Hai Jaan Title Song",
+    artist: "A.R. Rahman Gulzar",
+    src: "/audio/Jab Tak Hai Jaan Title Song  Yash Chopra  Shah Rukh Khan, Katrina, Anushka  A. R. Rahman  Gulzar.mp3",
+  },
 ];
