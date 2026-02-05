@@ -610,7 +610,7 @@ export const MUSIC_TRACKS = [
   },
   {
     id: "t47",
-    title: "Naruto Shippuuden OST 2",
+    title: "uNaruto Shippuuden OST 2",
     artist: "Instrumental",
     src: "/audio/Track 18 - Naruto Shippuuden OST 2 - Kokuten.mp3",
   },
