@@ -3,6 +3,19 @@
 // ===============================
 // Navbar
 // ===============================
+
+import {
+  TerminalSquare,
+  Folder,
+  FileText,
+  Mail,
+  Github,
+  Linkedin,
+  Settings,
+  Trash2,
+  Music,
+} from "lucide-react";
+
 export const navLinks = [
   { id: 1, name: "Projects", type: "finder", section: "projects" },
   { id: 2, name: "Education", type: "finder", section: "education" },
@@ -276,37 +289,58 @@ export const FINDER_DATA = {
 // ===============================
 // Dock defaults (optional)
 // ===============================
+// ===============================
+// Dock defaults
+// ===============================
 export const DOCK_APPS = [
   {
     id: "terminal",
     label: "Terminal",
     type: "terminal",
+    iconName: "terminal",
+    iconColor: "text-zinc-100",
     iconBg: "bg-zinc-900/80 border border-white/10",
   },
   {
     id: "finder",
     label: "Finder",
     type: "finder",
+    iconName: "folder",
+    iconColor: "text-sky-300",
     iconBg: "bg-gradient-to-b from-sky-400/90 to-blue-600/90",
   },
   {
     id: "notes",
     label: "Notes",
     type: "about",
-    iconBg: "bg-yellow-400/90",
+    iconName: "fileText",
+    iconColor: "text-violet-300",
+    iconBg: "bg-gradient-to-b from-violet-400/90 to-purple-600/90",
   },
   {
     id: "resume",
     label: "Resume",
     type: "resume",
-    iconBg: "bg-rose-500/90",
+    iconName: "fileText",
+    iconColor: "text-emerald-300",
+    iconBg: "bg-gradient-to-b from-emerald-400/90 to-teal-600/90",
   },
   {
     id: "contact",
     label: "Contact",
     type: "contact",
-    iconBg: "bg-emerald-500/90",
+    iconName: "mail",
+    iconColor: "text-pink-300",
+    iconBg: "bg-gradient-to-b from-pink-400/90 to-rose-600/90",
   },
+  {
+  id: "music",
+  label: "Music",
+  type: "music",
+  iconName: "music",
+  iconColor: "text-white",
+  iconBg: "bg-gradient-to-br from-pink-500/80 to-purple-600/80",
+},
 ];
 
 export const SOCIAL_LINKS = {
@@ -315,10 +349,38 @@ export const SOCIAL_LINKS = {
 };
 
 export const DOCK_EXTRAS = [
-  { id: "github", label: "GitHub", type: "github", iconBg: "bg-zinc-800/90" },
-  { id: "linkedin", label: "LinkedIn", type: "linkedin", iconBg: "bg-blue-600/90" },
-  { id: "settings", label: "Settings", type: "settings", iconBg: "bg-orange-500/90" },
-  { id: "trash", label: "Trash", type: "trash", iconBg: "bg-rose-500/90" },
+  {
+    id: "github",
+    label: "GitHub",
+    type: "github",
+    iconName: "github",
+    iconColor: "text-white/90",
+    iconBg: "bg-zinc-800/90",
+  },
+  {
+    id: "linkedin",
+    label: "LinkedIn",
+    type: "linkedin",
+    iconName: "linkedin",
+    iconColor: "text-cyan-300",
+    iconBg: "bg-blue-600/90",
+  },
+  {
+    id: "settings",
+    label: "Settings",
+    type: "settings",
+    iconName: "settings",
+    iconColor: "text-orange-300",
+    iconBg: "bg-orange-500/90",
+  },
+  {
+    id: "trash",
+    label: "Trash",
+    type: "trash",
+    iconName: "trash",
+    iconColor: "text-rose-300",
+    iconBg: "bg-rose-500/90",
+  },
 ];
 
 // ===============================
@@ -361,6 +423,12 @@ export const MUSIC_TRACKS = [
     title: "Bharat Ki Beti - Lyrical - Gunjan Saxena",
     artist: "Arijit Singh  Amit Trivedi Kausar Munir",
     src: "/audio/Bharat Ki Beti - Lyrical - Gunjan Saxena  Janhvi Kapoor  Arijit Singh  Amit Trivedi Kausar Munir.mp3",
+  },
+  {
+    id: "t7",
+    title: "Phir Se (Audio) Dhurandhar The Revenge",
+    artist: "Arijit Singh  Shashwat Sachdev, Arijit Singh, Irshad Kamil",
+    src: "/audio/Phir Se (Audio) Dhurandhar The Revenge Ranveer Singh Shashwat Sachdev,Arijit Singh,Irshad Kamil.mp3",
   },
   {
     id: "t7",

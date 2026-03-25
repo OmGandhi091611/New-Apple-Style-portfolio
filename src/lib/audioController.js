@@ -1,17 +1,5 @@
 // src/lib/audioController.js
 // One shared audio player + tiny pub/sub store (mobile + desktop both use this)
-//
-// Goals:
-// - Background/lock-screen playback reliability on iOS Brave/WebKit
-// - Volume control on non-iOS via audio.volume or WebAudio GainNode
-//
-// Key tradeoff:
-// - iOS background playback is more reliable with plain <audio> (no AudioContext).
-// - WebAudio (GainNode) enables in-app volume on iOS, but can stop on screen lock.
-//
-// Default behavior here:
-// - iOS: prefer background reliability => NO WebAudio (device volume controls loudness)
-// - non-iOS: use WebAudio GainNode available (smooth volume)
 
 let _tracks = [];
 let _index = 0;
@@ -20,28 +8,23 @@ const audio = new Audio();
 audio.preload = "metadata";
 audio.playsInline = true;
 
-// ---- Platform detection ----
 const IS_IOS =
   typeof navigator !== "undefined" &&
   /iPad|iPhone|iPod/i.test(navigator.userAgent);
 
-// Prefer background reliability on iOS (disable WebAudio by default)
 let _preferBackgroundOnIOS = true;
 
-// ---- WebAudio (optional) ----
 let audioCtx = null;
 let mediaNode = null;
 let gainNode = null;
 let _webAudioReady = false;
 
-// Volume state
 let _volume = 0.55;
 
 try {
   audio.volume = _volume;
 } catch {}
 
-// ---- Store ----
 let _state = {
   tracks: _tracks,
   index: _index,
@@ -60,21 +43,25 @@ function clamp(n, min, max) {
 
 function normalizeSrc(src) {
   if (!src) return "";
-  if (src.startsWith("/") || src.startsWith("http://") || src.startsWith("https://")) return src;
+  if (
+    src.startsWith("/") ||
+    src.startsWith("http://") ||
+    src.startsWith("https://")
+  ) {
+    return src;
+  }
   return `/audio/${src}`;
 }
 
 /* =========================
-   Media Session (lock screen / background friendliness)
+   Media Session
    ========================= */
 let _mediaSessionInited = false;
 
 function safeSetAction(action, handler) {
   try {
     navigator.mediaSession.setActionHandler(action, handler);
-  } catch {
-    // ignore unsupported actions
-  }
+  } catch {}
 }
 
 function updateMediaSession({ forceMetadata = false } = {}) {
@@ -90,9 +77,11 @@ function updateMediaSession({ forceMetadata = false } = {}) {
       safeSetAction("play", () => {
         if (audio.paused) togglePlay();
       });
+
       safeSetAction("pause", () => {
         if (!audio.paused) togglePlay();
       });
+
       safeSetAction("previoustrack", () => prev());
       safeSetAction("nexttrack", () => next());
     }
@@ -102,8 +91,6 @@ function updateMediaSession({ forceMetadata = false } = {}) {
         title: track.title || "Music",
         artist: track.artist || "Portfolio",
         album: track.album || "Om Gandhi",
-        // artwork optional:
-        // artwork: [{ src: track.artwork || "/cover.png", sizes: "512x512", type: "image/png" }],
       });
     }
 
@@ -111,6 +98,7 @@ function updateMediaSession({ forceMetadata = false } = {}) {
 
     const d = Number.isFinite(_state.duration) ? _state.duration : 0;
     const t = Number.isFinite(_state.currentTime) ? _state.currentTime : 0;
+
     if (navigator.mediaSession.setPositionState && d > 0) {
       navigator.mediaSession.setPositionState({
         duration: d,
@@ -118,16 +106,20 @@ function updateMediaSession({ forceMetadata = false } = {}) {
         playbackRate: 1,
       });
     }
-  } catch {
-    // ignore
-  }
+  } catch {}
 }
 
 /* =========================
    Emit
    ========================= */
 function emit(opts) {
-  _state = { ..._state, tracks: _tracks, index: _index, volume: _volume };
+  _state = {
+    ..._state,
+    tracks: _tracks,
+    index: _index,
+    volume: _volume,
+  };
+
   listeners.forEach((fn) => fn(_state));
   updateMediaSession(opts);
 }
@@ -136,7 +128,6 @@ function emit(opts) {
    WebAudio helpers
    ========================= */
 function shouldUseWebAudio() {
-  // iOS: prefer background reliability => return false (no AudioContext)
   if (IS_IOS && _preferBackgroundOnIOS) return false;
   return true;
 }
@@ -151,7 +142,6 @@ function ensureWebAudioGraph() {
 
     audioCtx = audioCtx || new Ctx();
 
-    // createMediaElementSource can only be called ONCE per audio element
     if (!mediaNode) mediaNode = audioCtx.createMediaElementSource(audio);
     if (!gainNode) gainNode = audioCtx.createGain();
 
@@ -160,7 +150,6 @@ function ensureWebAudioGraph() {
     mediaNode.connect(gainNode);
     gainNode.connect(audioCtx.destination);
 
-    // Avoid double scaling
     try {
       audio.volume = 1;
     } catch {}
@@ -183,7 +172,6 @@ function unlockAudioContext() {
 }
 
 function safePlay() {
-  // Only unlock WebAudio if we actually use it
   unlockAudioContext();
 
   const p = audio.play();
@@ -224,6 +212,10 @@ function setTrackIndex(nextIndex, { autoplay = true } = {}) {
 
   if (autoplay) safePlay();
   emit({ forceMetadata: true });
+}
+
+function setTrack(index, opts = {}) {
+  setTrackIndex(index, opts);
 }
 
 function initTracks(tracks) {
@@ -274,9 +266,9 @@ function seekTo(t) {
 function setVolume(v) {
   _volume = clamp(v, 0, 1);
 
-  // If using WebAudio, control gain. Otherwise, try element volume.
   if (shouldUseWebAudio()) {
     unlockAudioContext();
+
     if (_webAudioReady && gainNode && audioCtx) {
       try {
         gainNode.gain.setTargetAtTime(_volume, audioCtx.currentTime, 0.01);
@@ -289,8 +281,6 @@ function setVolume(v) {
       } catch {}
     }
   } else {
-    // iOS background mode: device volume is the real control.
-    // audio.volume may be ignored; still set it for non-iOS WebKit edge cases.
     try {
       audio.volume = _volume;
     } catch {}
@@ -350,7 +340,6 @@ audio.addEventListener("error", () => {
   emit();
 });
 
-// iOS-friendly ticker (sometimes timeupdate is sparse)
 setInterval(() => {
   if (!audio.paused) {
     _state.currentTime = audio.currentTime || 0;
@@ -380,16 +369,10 @@ export const audioActions = {
   seekTo,
   setVolume,
   setTrackIndex,
-
-  // Unlock WebAudio for non-iOS (or if you later disable iOS background preference)
+  setTrack,
   unlock: unlockAudioContext,
-
-  // OPTIONAL: let you flip the tradeoff at runtime:
-  // true  => iOS prefers background reliability (no WebAudio)
-  // false => iOS uses WebAudio for in-app volume (may stop on lock)
   setPreferBackgroundOnIOS: (v) => {
     _preferBackgroundOnIOS = !!v;
-    // If switching to WebAudio mode, build graph on next gesture
     emit();
   },
 };
