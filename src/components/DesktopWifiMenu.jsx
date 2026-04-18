@@ -1,211 +1,130 @@
 // src/components/DesktopWifiMenu.jsx
 import React, { useEffect, useMemo } from "react";
-import { motion } from "framer-motion";
-import { Check, Lock } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Wifi, WifiOff, Lock, Check } from "lucide-react";
+
+function rssiToBars(rssi) {
+  if (rssi >= -55) return 3;
+  if (rssi >= -70) return 2;
+  return 1;
+}
+
+function WifiBars({ bars, active }) {
+  const color = active ? "text-blue-400" : "text-white/50";
+  return (
+    <span className={`flex items-end gap-[2px] ${color}`}>
+      {[1, 2, 3].map((b) => (
+        <span
+          key={b}
+          className={`inline-block w-[3px] rounded-sm ${b <= bars ? "bg-current" : "bg-white/15"}`}
+          style={{ height: 4 + b * 3 }}
+        />
+      ))}
+    </span>
+  );
+}
 
 export default function DesktopWifiMenu({
   open,
-  anchorRect, // getBoundingClientRect() of wifi button
+  anchorRect,
   onRequestClose,
-  enabled = true,
+  enabled,
   onToggleEnabled,
   networks = [],
-  connectedSsid = "",
+  connectedSsid,
   onSelectNetwork,
 }) {
   const style = useMemo(() => {
     const gap = 10;
-    if (!anchorRect) return { top: 56 + gap, right: 24 };
-
+    if (!anchorRect) return { top: 56 + gap, left: 120 };
     const top = Math.round(anchorRect.bottom + gap);
-    const right = Math.max(12, Math.round(window.innerWidth - anchorRect.right));
-    return { top, right };
+    const left = Math.max(12, Math.round(anchorRect.left - 200));
+    return { top, left };
   }, [anchorRect]);
 
-  // ESC to close
   useEffect(() => {
     if (!open) return;
-    const onKey = (e) => {
-      if (e.key === "Escape") onRequestClose?.();
+    const onKey = (e) => e.key === "Escape" && onRequestClose?.();
+    const onDown = (e) => {
+      if (!e.target.closest("[data-wifi-menu]")) onRequestClose?.();
     };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("mousedown", onDown);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("mousedown", onDown);
+    };
   }, [open, onRequestClose]);
 
-  const sorted = useMemo(() => {
-    const list = Array.isArray(networks) ? networks.slice() : [];
-    // Put connected first, then strongest
-    list.sort((a, b) => {
-      const aConn = a.ssid === connectedSsid ? 1 : 0;
-      const bConn = b.ssid === connectedSsid ? 1 : 0;
-      if (aConn !== bConn) return bConn - aConn;
-      return (b.rssi ?? 0) - (a.rssi ?? 0);
-    });
-    return list;
-  }, [networks, connectedSsid]);
-
   return (
-    <>
-      {/* Click-outside backdrop */}
-      <div
-        className={[
-          "fixed inset-0 z-[219]",
-          open ? "pointer-events-auto" : "pointer-events-none",
-        ].join(" ")}
-        onMouseDown={onRequestClose}
-      />
-
-      <motion.div
-        initial={false}
-        animate={
-          open
-            ? { opacity: 1, scale: 1, y: 0 }
-            : { opacity: 0, scale: 0.985, y: -8 }
-        }
-        transition={{ type: "spring", stiffness: 520, damping: 44 }}
-        style={style}
-        className={[
-          "fixed z-[220] origin-top-right",
-          "w-[320px] max-w-[92vw]",
-          "rounded-[18px]",
-          "border border-white/12",
-          "bg-zinc-950/80",
-          "backdrop-blur-3xl backdrop-saturate-150",
-          "shadow-[0_20px_70px_rgba(0,0,0,0.55)]",
-          "p-2",
-          open ? "pointer-events-auto" : "pointer-events-none",
-        ].join(" ")}
-        onMouseDown={(e) => e.stopPropagation()}
-        role="menu"
-        aria-label="Wi-Fi"
-      >
-        {/* Header */}
-        <div className="px-2 pt-2 pb-1 flex items-center justify-between">
-          <div className="text-[13px] font-semibold text-white/90">Wi-Fi</div>
-
-          {/* macOS-like toggle */}
-          <button
-            type="button"
-            onClick={onToggleEnabled}
-            className={[
-              "h-7 w-12 rounded-full border border-white/12 transition relative",
-              enabled ? "bg-blue-500/90" : "bg-white/10",
-            ].join(" ")}
-            aria-pressed={enabled}
-            aria-label="Toggle Wi-Fi"
-          >
-            <span
-              className={[
-                "absolute top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-white",
-                "transition-transform",
-                enabled ? "translate-x-6" : "translate-x-1",
-              ].join(" ")}
-            />
-          </button>
-        </div>
-
-        <div className="h-px bg-white/10 my-1" />
-
-        {/* Networks */}
-        <div className="px-1 py-1">
-          {!enabled ? (
-            <div className="px-2 py-2 text-[12px] text-white/55">
-              Wi-Fi is turned off.
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          data-wifi-menu
+          initial={{ opacity: 0, scale: 0.95, y: -8 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: -8 }}
+          transition={{ duration: 0.15, ease: "easeOut" }}
+          style={{ position: "fixed", zIndex: 200, width: 260, ...style }}
+          className="rounded-2xl border border-white/10 bg-zinc-900/80 backdrop-blur-2xl shadow-2xl overflow-hidden"
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-white/8">
+            <div className="flex items-center gap-2 text-white/90">
+              <Wifi size={15} />
+              <span className="text-[13px] font-semibold">Wi-Fi</span>
             </div>
-          ) : sorted.length === 0 ? (
-            <div className="px-2 py-2 text-[12px] text-white/55">
-              No networks found.
-            </div>
-          ) : (
-            <div className="max-h-[260px] overflow-auto">
-              {sorted.map((n) => {
+            <button
+              type="button"
+              onClick={onToggleEnabled}
+              className={`w-9 h-5 rounded-full transition-colors duration-200 relative ${
+                enabled ? "bg-blue-500" : "bg-white/20"
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${
+                  enabled ? "translate-x-4" : "translate-x-0.5"
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* Network list */}
+          {enabled && networks.length > 0 && (
+            <ul className="py-1">
+              {networks.map((n) => {
                 const connected = n.ssid === connectedSsid;
+                const bars = rssiToBars(n.rssi);
                 return (
-                  <button
-                    key={n.ssid}
-                    type="button"
-                    onClick={() => onSelectNetwork?.(n)}
-                    className={[
-                      "w-full flex items-center gap-2",
-                      "rounded-[12px] px-2 py-2",
-                      "hover:bg-white/10 transition text-left",
-                    ].join(" ")}
-                    role="menuitem"
-                  >
-                    <div className="w-5 grid place-items-center text-white/80">
-                      {connected ? <Check className="h-4 w-4" /> : null}
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <div className="text-[13px] text-white/90 truncate">
+                  <li key={n.ssid}>
+                    <button
+                      type="button"
+                      onClick={() => onSelectNetwork?.(n)}
+                      className="w-full flex items-center gap-2 px-4 py-1.5 hover:bg-white/8 transition-colors text-left"
+                    >
+                      <span className="w-4 flex items-center justify-center">
+                        {connected && <Check size={12} className="text-blue-400" />}
+                      </span>
+                      <span className={`flex-1 text-[13px] ${connected ? "text-white font-medium" : "text-white/70"}`}>
                         {n.ssid}
-                      </div>
-                      {connected ? (
-                        <div className="text-[11px] text-white/55">Connected</div>
-                      ) : null}
-                    </div>
-
-                    {n.secure ? (
-                      <Lock className="h-4 w-4 text-white/40" />
-                    ) : (
-                      <span className="w-4" />
-                    )}
-
-                    <WifiBars rssi={n.rssi} />
-                  </button>
+                      </span>
+                      {n.secure && <Lock size={10} className="text-white/40" />}
+                      <WifiBars bars={bars} active={connected} />
+                    </button>
+                  </li>
                 );
               })}
+            </ul>
+          )}
+
+          {!enabled && (
+            <div className="flex items-center gap-2 px-4 py-3 text-white/40">
+              <WifiOff size={13} />
+              <span className="text-[12px]">Wi-Fi is turned off</span>
             </div>
           )}
-        </div>
-
-        <div className="h-px bg-white/10 my-1" />
-
-        {/* Footer actions */}
-        <div className="px-1 pb-1">
-          <MenuRow label="Other Networks…" onClick={() => {}} />
-          <MenuRow label="Wi-Fi Settings…" onClick={() => {}} />
-        </div>
-      </motion.div>
-    </>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
-}
-
-function MenuRow({ label, onClick }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="w-full rounded-[12px] px-3 py-2 text-[13px] text-white/80 hover:bg-white/10 transition text-left"
-    >
-      {label}
-    </button>
-  );
-}
-
-// Simple “signal bars” (mac-ish). rssi expected around -30 (great) to -90 (bad).
-function WifiBars({ rssi = -60 }) {
-  const level = rssiToLevel(rssi); // 0..3
-  return (
-    <div className="flex items-end gap-[2px] w-[22px] justify-end">
-      {[0, 1, 2, 3].map((i) => (
-        <span
-          key={i}
-          className={[
-            "block w-[3px] rounded-sm",
-            i <= level ? "bg-white/80" : "bg-white/20",
-          ].join(" ")}
-          style={{ height: 6 + i * 3 }}
-        />
-      ))}
-    </div>
-  );
-}
-
-function rssiToLevel(rssi) {
-  // -35..-55 => 3, -56..-67 => 2, -68..-80 => 1, else 0
-  if (rssi >= -55) return 3;
-  if (rssi >= -67) return 2;
-  if (rssi >= -80) return 1;
-  return 0;
 }

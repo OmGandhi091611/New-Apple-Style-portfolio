@@ -2,7 +2,18 @@
     "compilerOptions": {
         "baseUrl": ".",
         "paths": {
-            "#*": ["src/*"]
+            "#components": ["src/components"],
+            "#components/*": ["src/components/*"],
+            "#constants": ["src/constants"],
+            "#constants/*": ["src/constants/*"],
+            "#lib": ["src/lib"],
+            "#lib/*": ["src/lib/*"],
+            "#store": ["src/store"],
+            "#store/*": ["src/store/*"],
+            "#hoc": ["src/hoc"],
+            "#hoc/*": ["src/hoc/*"],
+            "#windows": ["src/windows"],
+            "#windows/*": ["src/windows/*"]
         }
     },
     "include": ["src"]

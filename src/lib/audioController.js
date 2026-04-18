@@ -1,5 +1,8 @@
 // src/lib/audioController.js
 // One shared audio player + tiny pub/sub store (mobile + desktop both use this)
+// Now uses ChunkedAudioLoader for range-request / MSE-based streaming.
+
+import { ChunkedAudioLoader } from '#lib/Chunkedaudioloader.js';
 
 let _tracks = [];
 let _index = 0;
@@ -7,6 +10,9 @@ let _index = 0;
 const audio = new Audio();
 audio.preload = "metadata";
 audio.playsInline = true;
+
+// ── Chunked loader instance (one per player) ────────────────────────────────
+const loader = new ChunkedAudioLoader(audio);
 
 const IS_IOS =
   typeof navigator !== "undefined" &&
@@ -204,13 +210,12 @@ function setTrackIndex(nextIndex, { autoplay = true } = {}) {
 
   audio.pause();
   audio.currentTime = 0;
-  audio.src = src;
 
-  try {
-    audio.load();
-  } catch {}
+  // ── CHANGED: hand off to the chunked loader instead of audio.src = src ──
+  loader.load(src).then(() => {
+    if (autoplay) safePlay();
+  });
 
-  if (autoplay) safePlay();
   emit({ forceMetadata: true });
 }
 
@@ -260,6 +265,10 @@ function seekTo(t) {
   const nextT = clamp(t, 0, d || 0);
   audio.currentTime = nextT;
   _state.currentTime = nextT;
+
+  // ── CHANGED: notify the loader so it fetches the right byte range ────────
+  loader.onSeek(nextT);
+
   emit();
 }
 
@@ -299,21 +308,12 @@ audio.addEventListener("timeupdate", () => {
 });
 
 function updateMeta() {
-  const d = Number.isFinite(audio.duration) ? audio.duration : 0;
-  _state.duration = d;
-  emit();
-
-  if (audio.duration === Infinity) {
-    try {
-      const old = audio.currentTime;
-      audio.currentTime = 1e101;
-      const onFix = () => {
-        audio.currentTime = old;
-        audio.removeEventListener("durationchange", onFix);
-      };
-      audio.addEventListener("durationchange", onFix);
-    } catch {}
+  if (Number.isFinite(audio.duration) && audio.duration > 0) {
+    _state.duration = audio.duration;
   }
+  // If Infinity, keep whatever we already have (the MSE estimate);
+  // the ChunkedAudioLoader sets mediaSource.duration from the first chunk.
+  emit();
 }
 
 audio.addEventListener("loadedmetadata", updateMeta);
