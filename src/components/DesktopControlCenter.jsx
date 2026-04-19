@@ -1,14 +1,10 @@
 // src/components/DesktopControlCenter.jsx
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   Wifi,
   Bluetooth,
   Send,
-  Play,
-  Pause,
-  SkipBack,
-  SkipForward,
   Moon,
   Sun,
   Volume2,
@@ -18,21 +14,9 @@ import {
   Camera,
   Airplay,
 } from "lucide-react";
-import { MUSIC_TRACKS } from "#constants";
-
-// ✅ shared audio (same as mobile)
-import { subscribeAudio, audioActions } from "../lib/audioController";
 
 function clamp(n, min, max) {
   return Math.max(min, Math.min(max, n));
-}
-
-function fmtTime(sec) {
-  if (!Number.isFinite(sec) || sec <= 0) return "0:00";
-  const s = Math.floor(sec);
-  const m = Math.floor(s / 60);
-  const r = s % 60;
-  return `${m}:${String(r).padStart(2, "0")}`;
 }
 
 export default function DesktopControlCenter({ open, anchorRect, onRequestClose }) {
@@ -61,45 +45,13 @@ export default function DesktopControlCenter({ open, anchorRect, onRequestClose 
   const [camOn, setCamOn] = useState(false);
   const [focusOn, setFocusOn] = useState(false);
 
-  // Keep brightness local but apply to CSS var (your App overlay uses this)
   const [brightness, setBrightness] = useState(0.85);
+  const [volume, setVolume] = useState(0.55);
 
-  // ✅ shared audio state
-  const [audioState, setAudioState] = useState(() => ({
-    tracks: [],
-    index: 0,
-    playing: false,
-    currentTime: 0,
-    duration: 0,
-    volume: 0.55,
-    error: "",
-  }));
-
-  // ✅ initialize tracks into shared controller (so changes in constants reflect)
-  useEffect(() => {
-    audioActions.initTracks(MUSIC_TRACKS);
-  }, [MUSIC_TRACKS]);
-
-  // ✅ subscribe to shared audio updates
-  useEffect(() => {
-    const unsub = subscribeAudio(setAudioState);
-    return unsub;
-  }, []);
-
-  // ✅ brightness var for overlay; keep it 0..1 because your overlay does calc(1 - brightness)
   useEffect(() => {
     const v = clamp(brightness, 0, 1);
     document.documentElement.style.setProperty("--ui-brightness", String(v));
-    // IMPORTANT: do NOT remove on unmount; otherwise mobile/desktop popovers will "reset" it
   }, [brightness]);
-
-  const activeTrack = useMemo(() => {
-    const t = audioState.tracks?.[audioState.index];
-    return t || null;
-  }, [audioState.tracks, audioState.index]);
-
-  const safeDur = Math.max(0, audioState.duration || 0);
-  const safeCur = Math.min(audioState.currentTime || 0, safeDur);
 
   const cycleAirdrop = () => {
     setAirdropMode((m) =>
@@ -165,30 +117,6 @@ export default function DesktopControlCenter({ open, anchorRect, onRequestClose 
           </div>
 
           <div className="space-y-3">
-            <NowPlaying
-              title={activeTrack?.title || "No Track"}
-              subtitle={activeTrack?.artist || "Add /public/audio/*.mp3"}
-              playing={!!audioState.playing}
-              onPrev={audioActions.prev}
-              onNext={audioActions.next}
-              onToggle={audioActions.togglePlay}
-              disabled={!audioState.tracks?.length}
-            />
-
-            {/* ✅ desktop progress bar now uses shared currentTime/duration */}
-            <div className="rounded-[24px] border border-white/12 bg-white/10 p-3">
-              <SeekBar
-                value={safeCur}
-                max={safeDur}
-                disabled={!audioState.tracks?.length || !safeDur}
-                onChange={(t) => audioActions.seekTo(t)}
-              />
-              <div className="mt-1 flex items-center justify-between text-[11px] text-white/55">
-                <span>{fmtTime(safeCur)}</span>
-                <span>{fmtTime(safeDur)}</span>
-              </div>
-            </div>
-
             <div className="grid grid-cols-2 gap-3">
               <CircleBtn
                 active={stageOn}
@@ -251,16 +179,14 @@ export default function DesktopControlCenter({ open, anchorRect, onRequestClose 
           onChange={(v) => setBrightness(clamp(v, 0, 1))}
         />
 
-        {/* ✅ Sound uses shared volume */}
         <div className="mt-3 rounded-[22px] border border-white/12 bg-white/10 px-4 py-3 relative">
           <div className="text-[13px] font-semibold text-white/80 mb-2">Sound</div>
           <div className="flex items-center gap-3">
             <Volume2 className="h-4 w-4 text-white/60" />
             <SeekBar
-              value={audioState.volume || 0}
+              value={volume}
               max={1}
-              onChange={(v) => audioActions.setVolume(v)}
-              disabled={!audioState.tracks?.length}
+              onChange={(v) => setVolume(clamp(v, 0, 1))}
             />
             <Volume2 className="h-5 w-5 text-white/85" />
           </div>
@@ -285,10 +211,6 @@ export default function DesktopControlCenter({ open, anchorRect, onRequestClose 
             Edit Controls
           </button>
         </div>
-
-        {audioState.error ? (
-          <div className="mt-3 text-[11px] text-red-300 break-words">{audioState.error}</div>
-        ) : null}
       </motion.div>
     </>
   );
@@ -321,54 +243,6 @@ function MacPill({ active, icon, iconColor, title, subtitle, onClick }) {
           <div className="text-[12px] text-white/60 whitespace-pre-line leading-[1.1]">{subtitle}</div>
         </div>
       </div>
-    </button>
-  );
-}
-
-function NowPlaying({ title, subtitle, playing, onPrev, onNext, onToggle, disabled }) {
-  return (
-    <div className="rounded-[24px] border border-white/12 bg-white/10 p-3">
-      <div className="flex items-center gap-3">
-        <div className="h-10 w-10 rounded-xl border border-white/12 bg-white/12" />
-        <div className="min-w-0 flex-1">
-          <div className="text-[13px] font-semibold text-white/85 truncate">{title}</div>
-          <div className="text-[12px] text-white/55 truncate">{subtitle}</div>
-        </div>
-      </div>
-
-      <div className="mt-3 flex items-center justify-end gap-2 text-white/80">
-        <GhostBtn onClick={onPrev} disabled={disabled} aria="Previous">
-          <SkipBack className="h-5 w-5" />
-        </GhostBtn>
-
-        <button
-          type="button"
-          onClick={onToggle}
-          disabled={disabled}
-          className="h-9 w-9 rounded-xl bg-white/12 hover:bg-white/16 disabled:opacity-40 transition grid place-items-center"
-          aria-label={playing ? "Pause" : "Play"}
-        >
-          {playing ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-        </button>
-
-        <GhostBtn onClick={onNext} disabled={disabled} aria="Next">
-          <SkipForward className="h-5 w-5" />
-        </GhostBtn>
-      </div>
-    </div>
-  );
-}
-
-function GhostBtn({ children, onClick, disabled, aria }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      aria-label={aria}
-      className="h-9 w-9 rounded-xl hover:bg-white/12 disabled:opacity-40 transition grid place-items-center"
-    >
-      {children}
     </button>
   );
 }

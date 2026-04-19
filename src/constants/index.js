@@ -13,7 +13,6 @@ import {
   Linkedin,
   Settings,
   Trash2,
-  Music,
 } from "lucide-react";
 
 export const navLinks = [
@@ -333,14 +332,6 @@ export const DOCK_APPS = [
     iconColor: "text-pink-300",
     iconBg: "bg-gradient-to-b from-pink-400/90 to-rose-600/90",
   },
-  {
-  id: "music",
-  label: "Music",
-  type: "music",
-  iconName: "music",
-  iconColor: "text-white",
-  iconBg: "bg-gradient-to-br from-pink-500/80 to-purple-600/80",
-},
 ];
 
 export const SOCIAL_LINKS = {
@@ -383,9 +374,4 @@ export const DOCK_EXTRAS = [
   },
 ];
 
-// ===============================
-// Music / Control Center tracks
-// Drop mp3s in /public/audio — they appear automatically (no code edits needed)
-// ===============================
-export { MUSIC_TRACKS } from 'virtual:audio-tracks';
 

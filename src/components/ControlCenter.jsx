@@ -1,5 +1,5 @@
 // src/components/ControlCenter.jsx
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion, animate, useDragControls, useMotionValue } from "framer-motion";
 import {
   Airplay,
@@ -9,26 +9,11 @@ import {
   Focus,
   Flashlight,
   Camera,
-  Play,
-  Pause,
-  SkipForward,
-  SkipBack,
-  Volume2,
   Sun,
 } from "lucide-react";
-import { MUSIC_TRACKS } from "#constants";
-import { subscribeAudio, audioActions } from "../lib/audioController";
 
 function clamp(n, min, max) {
   return Math.max(min, Math.min(max, n));
-}
-
-function fmtTime(sec) {
-  if (!Number.isFinite(sec) || sec < 0) return "0:00";
-  const s = Math.floor(sec);
-  const m = Math.floor(s / 60);
-  const r = s % 60;
-  return `${m}:${String(r).padStart(2, "0")}`;
 }
 
 export default function ControlCenter({
@@ -42,47 +27,17 @@ export default function ControlCenter({
   const y = yExternal ?? useMotionValue(closedY);
   const dragControls = useDragControls();
 
-  // local UI toggles
   const [toggles, setToggles] = useState({ wifi: true, bluetooth: true, airplane: false });
-
-  // brightness + shared audio state
   const [brightness, setBrightness] = useState(initialBrightness);
-  const [audioState, setAudioState] = useState(() => ({
-    tracks: [],
-    index: 0,
-    playing: false,
-    currentTime: 0,
-    duration: 0,
-    volume: 0.55,
-    error: "",
-  }));
 
   const [rendered, setRendered] = useState(open);
   const closeTimerRef = useRef(null);
 
-  // Init tracks into the shared controller whenever constants change
-  useEffect(() => {
-    audioActions.initTracks(MUSIC_TRACKS);
-  }, [MUSIC_TRACKS]);
-
-  // Subscribe to shared audio
-  useEffect(() => {
-    const unsub = subscribeAudio(setAudioState);
-    return unsub;
-  }, []);
-
-  const activeTrack = useMemo(() => {
-    const t = audioState.tracks?.[audioState.index];
-    return t || null;
-  }, [audioState.tracks, audioState.index]);
-
-  // Brightness overlay driver
   useEffect(() => {
     const v = clamp(brightness, 0, 1);
     document.documentElement.style.setProperty("--ui-brightness", String(v));
   }, [brightness]);
 
-  // Mount/unmount for animation
   useEffect(() => {
     if (open) {
       setRendered(true);
@@ -95,7 +50,6 @@ export default function ControlCenter({
     };
   }, [open, rendered]);
 
-  // Animate y if not external-driven
   useEffect(() => {
     if (yExternal) return;
     animate(y, open ? openY : closedY, { type: "spring", stiffness: 520, damping: 44 });
@@ -103,15 +57,11 @@ export default function ControlCenter({
 
   if (!rendered) return null;
 
-  const safeDur = Number.isFinite(audioState.duration) ? audioState.duration : 0;
-  const safeCur = Number.isFinite(audioState.currentTime) ? Math.min(audioState.currentTime, safeDur || 0) : 0;
-
   const constraintTop = Math.min(closedY, openY);
   const constraintBottom = Math.max(closedY, openY);
 
   return (
     <>
-      {/* Backdrop */}
       <motion.div
         initial={false}
         animate={{ opacity: open ? 1 : 0 }}
@@ -121,7 +71,6 @@ export default function ControlCenter({
         <button className="absolute inset-0 bg-black/55" aria-label="Close control center" onClick={onClose} type="button" />
       </motion.div>
 
-      {/* Sheet */}
       <motion.div
         className={[
           "fixed left-0 right-0 z-[90]",
@@ -144,20 +93,16 @@ export default function ControlCenter({
         dragConstraints={{ top: constraintTop, bottom: constraintBottom }}
         dragElastic={0.08}
         onDragEnd={(_, info) => {
-          // close if dragged up enough
           const shouldClose = info.offset.y < -110 || info.velocity.y < -700;
           if (shouldClose) onClose?.();
           else animate(y, openY, { type: "spring", stiffness: 520, damping: 44 });
         }}
       >
-        {/* Drag handle */}
         <div className="px-4 pt-3 pb-2" onPointerDown={(e) => dragControls.start(e)} style={{ touchAction: "none" }}>
           <div className="mx-auto h-1.5 w-12 rounded-full bg-white/25" />
         </div>
 
-        {/* Scrollable content */}
         <div className="px-4 pb-4 max-h-[calc(100vh-56px)] overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: "touch" }}>
-          {/* Quick toggles */}
           <div className="grid grid-cols-4 gap-3">
             <Toggle icon={<Airplay className="h-5 w-5" />} label="AirDrop" active onClick={() => {}} />
             <Toggle
@@ -180,103 +125,6 @@ export default function ControlCenter({
             />
           </div>
 
-          {/* Now Playing (like desktop — track + artist + progress + time) */}
-          <div className="mt-4 rounded-2xl border border-white/10 bg-white/6 p-4">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <div className="text-[12px] text-white/70">Now Playing</div>
-                <div className="mt-0.5 text-sm text-white/90 font-semibold truncate">
-                  {activeTrack?.title || "No tracks added"}
-                </div>
-                <div className="text-[12px] text-white/60 truncate">
-                  {activeTrack?.artist || "Add audio files in /public/audio"}
-                </div>
-                {audioState.error ? (
-                  <div className="mt-2 text-[11px] text-rose-300/90 break-words">{audioState.error}</div>
-                ) : null}
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={audioActions.prev}
-                  disabled={!audioState.tracks.length}
-                  className={[
-                    "grid h-10 w-10 place-items-center rounded-xl border border-white/10",
-                    audioState.tracks.length ? "bg-black/25 text-white/85" : "bg-white/5 opacity-60",
-                    "active:scale-[0.98]",
-                  ].join(" ")}
-                  aria-label="Previous"
-                >
-                  <SkipBack className="h-5 w-5" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={audioActions.togglePlay}
-                  disabled={!audioState.tracks.length}
-                  className={[
-                    "grid h-10 w-10 place-items-center rounded-xl border border-white/10",
-                    audioState.tracks.length ? "bg-white/12 text-white/90" : "bg-white/5 opacity-60",
-                    "active:scale-[0.98]",
-                  ].join(" ")}
-                  aria-label="Play/Pause"
-                >
-                  {audioState.playing ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={audioActions.next}
-                  disabled={!audioState.tracks.length}
-                  className={[
-                    "grid h-10 w-10 place-items-center rounded-xl border border-white/10",
-                    audioState.tracks.length ? "bg-black/25 text-white/85" : "bg-white/5 opacity-60",
-                    "active:scale-[0.98]",
-                  ].join(" ")}
-                  aria-label="Next"
-                >
-                  <SkipForward className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Progress + times */}
-            <div className="mt-3">
-              <ProgressBar
-                value={safeCur}
-                max={safeDur}
-                disabled={!safeDur}
-                onSeek={(t) => audioActions.seekTo(t)}
-              />
-              <div className="mt-1 flex items-center justify-between text-[11px] text-white/60 tabular-nums">
-                <span>{fmtTime(safeCur)}</span>
-                <span>{fmtTime(safeDur)}</span>
-              </div>
-            </div>
-
-            {/* Volume */}
-            <div className="mt-3">
-              <div className="flex items-center justify-between text-[11px] text-white/60">
-                <span>Volume</span>
-                <span className="tabular-nums">{Math.round((audioState.volume || 0) * 100)}%</span>
-              </div>
-              <div className="mt-2 flex items-center gap-3">
-                <Volume2 className="h-4 w-4 text-white/60" />
-                <div className="flex-1">
-                  <ProgressBar
-                    value={audioState.volume || 0}
-                    max={1}
-                    disabled={!audioState.tracks.length}
-                    onSeek={(v) => audioActions.setVolume(v)}
-                  />
-                </div>
-                <Volume2 className="h-5 w-5 text-white/85" />
-              </div>
-            </div>
-          </div>
-
-          {/* Brightness */}
           <div className="mt-4 rounded-2xl border border-white/10 bg-white/6 p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-white/85">
@@ -290,7 +138,6 @@ export default function ControlCenter({
             </div>
           </div>
 
-          {/* Shortcuts */}
           <div className="mt-4 grid grid-cols-3 gap-3">
             <Shortcut icon={<Focus className="h-5 w-5" />} label="Focus" />
             <Shortcut icon={<Flashlight className="h-5 w-5" />} label="Flashlight" />
