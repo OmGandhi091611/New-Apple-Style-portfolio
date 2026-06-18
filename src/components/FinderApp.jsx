@@ -12,6 +12,8 @@ import {
   FileBadge,
 } from "lucide-react";
 
+import papersData from "../data/papers.json";
+
 const DATA = {
   root: [
     { id: "projects", type: "folder", name: "Projects", icon: Folder },
@@ -66,24 +68,7 @@ const DATA = {
     },
   ],
 
-  papers: [
-    {
-      id: "p1",
-      type: "item",
-      name: "Sharding Simulations",
-      subtitle: "Evaluation of sharding strategies (NEAR/MEMO-style) using a simulator",
-      tags: ["Blockchain", "Sharding"],
-      action: { kind: "noop" }, // replace with link later
-    },
-    {
-      id: "p2",
-      type: "item",
-      name: "TreeMedChain",
-      subtitle: "Healthcare + data security concept (paper/project)",
-      tags: ["Healthcare", "Security"],
-      action: { kind: "noop" }, // replace with link later
-    },
-  ],
+  papers: papersData,
 };
 
 function openLink(href) {

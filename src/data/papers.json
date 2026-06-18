@@ -1,18 +1,10 @@
 [
   {
-    "id": "treemedchain",
+    "id": "sharding_simulations",
     "type": "item",
-    "name": "TreeMedChain",
-    "subtitle": "Medical records integrity concept + draft",
-    "tags": ["Healthcare", "Blockchain"],
-    "action": { "kind": "noop" }
-  },
-  {
-    "id": "dijkstranet",
-    "type": "item",
-    "name": "DijkstraNet",
-    "subtitle": "Attention-guided routing optimizer (research idea)",
-    "tags": ["Networks", "GNN", "Optimization"],
+    "name": "Sharding Simulations",
+    "subtitle": "Evaluation of sharding strategies (NEAR/MEMO-style) using a simulator",
+    "tags": ["Blockchain", "Sharding"],
     "action": { "kind": "noop" }
   }
 ]
