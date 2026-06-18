@@ -15,6 +15,8 @@ import {
   Trash2,
 } from "lucide-react";
 
+import papersData from "../data/papers.json";
+
 export const navLinks = [
   { id: 1, name: "Projects", type: "finder", section: "projects" },
   { id: 2, name: "Education", type: "finder", section: "education" },
@@ -265,24 +267,7 @@ export const FINDER_DATA = {
     },
   ],
 
-  papers: [
-    {
-      id: "treemedchain",
-      type: "item",
-      name: "TreeMedChain",
-      subtitle: "Medical records integrity concept + draft",
-      tags: ["Healthcare", "Blockchain"],
-      action: { kind: "noop" },
-    },
-    {
-      id: "dijkstranet",
-      type: "item",
-      name: "DijkstraNet",
-      subtitle: "Attention-guided routing optimizer (research idea)",
-      tags: ["Networks", "GNN", "Optimization"],
-      action: { kind: "noop" },
-    },
-  ],
+  papers: papersData,
 };
 
 // ===============================

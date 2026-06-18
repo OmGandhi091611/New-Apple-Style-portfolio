@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Om Gandhi</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0d0d0d;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+      color: #e5e5e5;
+      padding: 24px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 440px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 36px 40px 40px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .header h1 {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      color: #fff;
+    }
+
+    .header p {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.32);
+      margin-top: 5px;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 28px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 8px;
+      background: transparent;
+      border: none;
+      border-radius: 7px;
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 13px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .tab-btn.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    /* Panels */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .field { margin-bottom: 15px; }
+
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+      margin-bottom: 7px;
+    }
+
+    input[type="password"],
+    input[type="text"],
+    input[type="url"] {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 9px;
+      color: #e5e5e5;
+      font-size: 13.5px;
+      font-family: inherit;
+      padding: 11px 13px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input:focus { border-color: rgba(255, 255, 255, 0.28); }
+
+    input::placeholder { color: rgba(255, 255, 255, 0.2); }
+
+    .file-drop {
+      width: 100%;
+      border: 1.5px dashed rgba(255, 255, 255, 0.12);
+      border-radius: 9px;
+      padding: 22px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      position: relative;
+    }
+
+    .file-drop:hover, .file-drop.drag-over {
+      border-color: rgba(255, 255, 255, 0.28);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .file-drop input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .drop-icon { font-size: 26px; margin-bottom: 6px; }
+    .drop-text { font-size: 12.5px; color: rgba(255, 255, 255, 0.35); }
+    .drop-name { font-size: 12.5px; color: rgba(255, 255, 255, 0.75); font-weight: 500; margin-top: 3px; }
+
+    .hint {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.25);
+      margin-top: 5px;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      margin-top: 22px;
+      padding: 12px;
+      background: #fff;
+      color: #0d0d0d;
+      border: none;
+      border-radius: 9px;
+      font-size: 13.5px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      letter-spacing: -0.1px;
+    }
+
+    button[type="submit"]:hover { opacity: 0.88; }
+    button[type="submit"]:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .status {
+      margin-top: 13px;
+      font-size: 12.5px;
+      text-align: center;
+      min-height: 16px;
+      border-radius: 8px;
+      transition: all 0.15s;
+    }
+
+    .status:not(:empty) { padding: 9px 13px; }
+
+    .status-success {
+      background: rgba(52, 199, 89, 0.1);
+      color: #34c759;
+      border: 1px solid rgba(52, 199, 89, 0.18);
+    }
+
+    .status-error {
+      background: rgba(255, 59, 48, 0.1);
+      color: #ff3b30;
+      border: 1px solid rgba(255, 59, 48, 0.18);
+    }
+
+    .status-loading { color: rgba(255, 255, 255, 0.35); }
+
+    .divider {
+      border: none;
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      margin: 20px 0;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.25);
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+      margin-bottom: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <h1>Portfolio Admin</h1>
+      <p>Deploy changes without touching code</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="resume">Resume</button>
+      <button class="tab-btn" data-tab="papers">Papers</button>
+    </div>
+
+    <!-- ── Resume Tab ── -->
+    <div class="panel active" id="panel-resume">
+      <form id="resumeForm">
+        <div class="field">
+          <label>Admin Password</label>
+          <input type="password" id="r-password" placeholder="••••••••" required autocomplete="current-password" />
+        </div>
+        <div class="field">
+          <label>Resume PDF</label>
+          <div class="file-drop" id="dropZone">
+            <input type="file" id="r-file" accept=".pdf" required />
+            <div class="drop-icon">📄</div>
+            <div class="drop-text">Click to browse or drag & drop</div>
+            <div class="drop-name" id="r-fileName"></div>
+          </div>
+        </div>
+        <button type="submit" id="r-btn">Upload &amp; Deploy</button>
+      </form>
+      <div class="status" id="r-status"></div>
+    </div>
+
+    <!-- ── Papers Tab ── -->
+    <div class="panel" id="panel-papers">
+      <form id="papersForm">
+        <div class="field">
+          <label>Admin Password</label>
+          <input type="password" id="p-password" placeholder="••••••••" required autocomplete="current-password" />
+        </div>
+
+        <hr class="divider" />
+        <div class="section-label">Paper details</div>
+
+        <div class="field">
+          <label>Title <span style="color:#ff3b30">*</span></label>
+          <input type="text" id="p-title" placeholder="e.g. TreeMedChain" required />
+          <div class="hint">Matches an existing paper by title to update it; otherwise adds a new one.</div>
+        </div>
+        <div class="field">
+          <label>Description</label>
+          <input type="text" id="p-subtitle" placeholder="e.g. Medical records integrity on-chain" />
+        </div>
+        <div class="field">
+          <label>Tags</label>
+          <input type="text" id="p-tags" placeholder="Blockchain, Healthcare, Security" />
+          <div class="hint">Comma-separated.</div>
+        </div>
+        <div class="field">
+          <label>Paper URL</label>
+          <input type="url" id="p-url" placeholder="https://arxiv.org/abs/…" />
+          <div class="hint">arXiv, conference, or any public link. Leave empty if not published yet.</div>
+        </div>
+
+        <button type="submit" id="p-btn">Save &amp; Deploy</button>
+      </form>
+      <div class="status" id="p-status"></div>
+    </div>
+  </div>
+
+  <script>
+    // ── Tab switching ──
+    document.querySelectorAll('.tab-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach((p) => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+      });
+    });
+
+    // ── Helpers ──
+    function setStatus(el, msg, type) {
+      el.textContent = msg;
+      el.className = 'status' + (type ? ` status-${type}` : '');
+    }
+
+    // ── Resume upload ──
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('r-file');
+    const fileNameEl = document.getElementById('r-fileName');
+
+    fileInput.addEventListener('change', () => {
+      fileNameEl.textContent = fileInput.files[0]?.name ?? '';
+    });
+
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+      if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        fileNameEl.textContent = e.dataTransfer.files[0].name;
+      }
+    });
+
+    document.getElementById('resumeForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const statusEl = document.getElementById('r-status');
+      const btn = document.getElementById('r-btn');
+      const password = document.getElementById('r-password').value;
+      const file = fileInput.files[0];
+
+      if (!file) { setStatus(statusEl, 'Please select a PDF file.', 'error'); return; }
+      if (file.type !== 'application/pdf') { setStatus(statusEl, 'Only PDF files are accepted.', 'error'); return; }
+      if (file.size > 4 * 1024 * 1024) { setStatus(statusEl, 'File too large (max 4 MB).', 'error'); return; }
+
+      btn.disabled = true;
+      setStatus(statusEl, 'Reading file…', 'loading');
+
+      try {
+        const fileBase64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result.split(',')[1]);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+
+        setStatus(statusEl, 'Uploading to GitHub…', 'loading');
+
+        const res = await fetch('/api/upload-resume', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password, fileBase64 }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          setStatus(statusEl, 'Resume uploaded! Vercel is now deploying…', 'success');
+          document.getElementById('resumeForm').reset();
+          fileNameEl.textContent = '';
+        } else {
+          setStatus(statusEl, data.error || 'Upload failed. Please try again.', 'error');
+        }
+      } catch {
+        setStatus(statusEl, 'Network error. Please try again.', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // ── Papers ──
+    document.getElementById('papersForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const statusEl = document.getElementById('p-status');
+      const btn = document.getElementById('p-btn');
+
+      const password = document.getElementById('p-password').value;
+      const title    = document.getElementById('p-title').value.trim();
+      const subtitle = document.getElementById('p-subtitle').value.trim();
+      const tags     = document.getElementById('p-tags').value.trim();
+      const url      = document.getElementById('p-url').value.trim();
+
+      if (!title) { setStatus(statusEl, 'Title is required.', 'error'); return; }
+
+      btn.disabled = true;
+      setStatus(statusEl, 'Saving to GitHub…', 'loading');
+
+      try {
+        const res = await fetch('/api/add-paper', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password, title, subtitle, tags, url }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          const verb = data.action === 'updated' ? 'updated' : 'added';
+          setStatus(statusEl, `Paper ${verb}! Vercel is now deploying…`, 'success');
+          document.getElementById('papersForm').reset();
+        } else {
+          setStatus(statusEl, data.error || 'Failed. Please try again.', 'error');
+        }
+      } catch {
+        setStatus(statusEl, 'Network error. Please try again.', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

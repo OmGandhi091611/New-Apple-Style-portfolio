@@ -1,0 +1,18 @@
+[
+  {
+    "id": "treemedchain",
+    "type": "item",
+    "name": "TreeMedChain",
+    "subtitle": "Medical records integrity concept + draft",
+    "tags": ["Healthcare", "Blockchain"],
+    "action": { "kind": "noop" }
+  },
+  {
+    "id": "dijkstranet",
+    "type": "item",
+    "name": "DijkstraNet",
+    "subtitle": "Attention-guided routing optimizer (research idea)",
+    "tags": ["Networks", "GNN", "Optimization"],
+    "action": { "kind": "noop" }
+  }
+]
