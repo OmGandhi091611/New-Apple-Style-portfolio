@@ -1,10 +1,1 @@
-[
-  {
-    "id": "sharding_simulations",
-    "type": "item",
-    "name": "Sharding Simulations",
-    "subtitle": "Evaluation of sharding strategies (NEAR/MEMO-style) using a simulator",
-    "tags": ["Blockchain", "Sharding"],
-    "action": { "kind": "noop" }
-  }
-]
+[]
