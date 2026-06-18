@@ -13,5 +13,21 @@
       "kind": "link",
       "href": "https://arxiv.org/abs/2606.14394"
     }
+  },
+  {
+    "id": "vaultxgpu_gpu_accelerated_blockchain_consensus",
+    "type": "item",
+    "name": "VaultxGPU: GPU-Accelerated Blockchain Consensus",
+    "subtitle": "GPU performance for Proof of space consensus",
+    "tags": [
+      "Blockchain",
+      "Scalability",
+      "Distributed Systems",
+      "Energy-efficient"
+    ],
+    "action": {
+      "kind": "link",
+      "href": "https://arxiv.org/abs/2606.14007"
+    }
   }
 ]
