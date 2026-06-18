@@ -1,1 +1,17 @@
-[]
+[
+  {
+    "id": "simulation_based_performance_evaluation_of_sharded_blockchain_architectures",
+    "type": "item",
+    "name": "Simulation-Based Performance Evaluation of Sharded Blockchain Architectures",
+    "subtitle": "About Sharding architectures and how they scale",
+    "tags": [
+      "Blockchain",
+      "Scalability",
+      "Distributed Systems"
+    ],
+    "action": {
+      "kind": "link",
+      "href": "https://arxiv.org/abs/2606.14394"
+    }
+  }
+]
