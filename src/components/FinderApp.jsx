@@ -22,7 +22,7 @@ const DATA = {
     {
       id: "resume",
       type: "item",
-      name: "Resume",
+      name: "CV",
       subtitle: "Open PDF in new tab",
       tags: ["PDF"],
       icon: FileBadge,

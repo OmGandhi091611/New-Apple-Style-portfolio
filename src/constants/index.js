@@ -21,7 +21,7 @@ export const navLinks = [
   { id: 1, name: "Projects", type: "finder", section: "projects" },
   { id: 2, name: "Education", type: "finder", section: "education" },
   { id: 3, name: "Papers", type: "finder", section: "papers" },
-  { id: 4, name: "Resume", type: "resume" },
+  { id: 4, name: "CV", type: "resume" },
 ];
 
 
@@ -39,7 +39,7 @@ export const TERMINAL_PROFILE = {
   username: "om",
   hostname: "macbook",
   home: "/Users/om",
-  resumeUrl: "/Om_Amit_Gandhi_Resume.pdf",
+  resumeUrl: "/Om_Amit_Gandhi_CV.pdf",
   contactEmail: "ogandhi1@hawk.illinoistect.edu",
 };
 
@@ -72,7 +72,7 @@ export const makeVFS = (HOME) => ({
       "Papers",
       "Contact",
       "about",
-      "resume.pdf",
+      "cv.pdf",
     ],
   },
 
@@ -86,7 +86,7 @@ export const makeVFS = (HOME) => ({
   [`${HOME}/Contact`]: { type: "dir", children: ["email.txt"] },
 
   // files
-  [`${HOME}/resume.pdf`]: { type: "file", content: "(binary)" },
+  [`${HOME}/cv.pdf`]: { type: "file", content: "(binary)" },
 
   [`${HOME}/Projects/memo.md`]: {
     type: "file",
@@ -160,7 +160,7 @@ export const terminalHelpText = [
   "Examples:",
   "  ls",
   "  open about",
-  "  open resume.pdf",
+  "  open cv.pdf",
   "  projects",
 ].join("\n");
 
@@ -181,7 +181,7 @@ I enjoy building performance-heavy systems (C/OpenMP, simulators) and clean UIs 
 Try in Terminal:
   open about
   open projects
-  open resume.pdf
+  open cv.pdf
 
 Current focus:
 - Sharding simulations (NEAR/MEMO)
@@ -303,7 +303,7 @@ export const DOCK_APPS = [
   },
   {
     id: "resume",
-    label: "Resume",
+    label: "CV",
     type: "resume",
     iconName: "fileText",
     iconColor: "text-emerald-300",

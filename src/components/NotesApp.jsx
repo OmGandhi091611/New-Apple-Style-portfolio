@@ -51,7 +51,7 @@ export default function NotesApp({ resumeUrl = null }) {
     !!resumeUrl &&
     !!selected &&
     typeof selected.body === "string" &&
-    selected.body.toLowerCase().includes("resume");
+    selected.body.toLowerCase().includes("cv");
 
   /* ======================
      Mobile: LIST -> DETAIL
@@ -112,7 +112,7 @@ export default function NotesApp({ resumeUrl = null }) {
               className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-sm text-white/95 hover:bg-white/15 active:scale-[0.99] transition"
             >
               <FileText className="h-4 w-4" />
-              Open Resume
+              Open CV
             </a>
           )}
         </div>
@@ -163,7 +163,7 @@ export default function NotesApp({ resumeUrl = null }) {
             className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-sm text-white/95 hover:bg-white/15 active:scale-[0.99] transition"
           >
             <FileText className="h-4 w-4" />
-            Open Resume
+            Open CV
           </a>
         )}
       </div>

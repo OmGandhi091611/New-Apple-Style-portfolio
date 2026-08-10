@@ -306,8 +306,8 @@ export default function TerminalXterm({
           }
 
           // Keep real PDF behavior
-          if (p.endsWith("resume.pdf")) {
-            writeln("Opening resume.pdf…");
+          if (p.endsWith("cv.pdf")) {
+            writeln("Opening cv.pdf…");
             openLink(resumeUrl);
             return;
           }
