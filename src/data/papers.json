@@ -1,1 +1,33 @@
-[]
+[
+  {
+    "id": "simulation_based_performance_evaluation_of_sharded_blockchain_architectures",
+    "type": "item",
+    "name": "Simulation-Based Performance Evaluation of Sharded Blockchain Architectures",
+    "subtitle": "About Sharding architectures and how they scale",
+    "tags": [
+      "Blockchain",
+      "Scalability",
+      "Distributed Systems"
+    ],
+    "action": {
+      "kind": "link",
+      "href": "https://arxiv.org/abs/2606.14394"
+    }
+  },
+  {
+    "id": "vaultxgpu_gpu_accelerated_blockchain_consensus",
+    "type": "item",
+    "name": "VaultxGPU: GPU-Accelerated Blockchain Consensus",
+    "subtitle": "GPU performance for Proof of space consensus",
+    "tags": [
+      "Blockchain",
+      "Scalability",
+      "Distributed Systems",
+      "Energy-efficient"
+    ],
+    "action": {
+      "kind": "link",
+      "href": "https://arxiv.org/abs/2606.14007"
+    }
+  }
+]
