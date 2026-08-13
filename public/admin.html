@@ -217,6 +217,7 @@
     <div class="tabs">
       <button class="tab-btn active" data-tab="resume">Resume</button>
       <button class="tab-btn" data-tab="papers">Papers</button>
+      <button class="tab-btn" data-tab="photos">Photos</button>
     </div>
 
     <!-- ── Resume Tab ── -->
@@ -274,6 +275,37 @@
         <button type="submit" id="p-btn">Save &amp; Deploy</button>
       </form>
       <div class="status" id="p-status"></div>
+    </div>
+
+    <!-- ── Photos Tab ── -->
+    <div class="panel" id="panel-photos">
+      <form id="photoForm">
+        <div class="field">
+          <label>Admin Password</label>
+          <input type="password" id="ph-password" placeholder="••••••••" required autocomplete="current-password" />
+        </div>
+
+        <hr class="divider" />
+        <div class="section-label">Photo details</div>
+
+        <div class="field">
+          <label>Caption</label>
+          <input type="text" id="ph-caption" placeholder="e.g. Family — Diwali 2025" />
+        </div>
+        <div class="field">
+          <label>Photo</label>
+          <div class="file-drop" id="photoDropZone">
+            <input type="file" id="ph-file" accept="image/*" required />
+            <div class="drop-icon">🖼️</div>
+            <div class="drop-text">Click to browse or drag & drop</div>
+            <div class="drop-name" id="ph-fileName"></div>
+          </div>
+          <div class="hint">JPG, PNG, WebP, or GIF, up to 4 MB.</div>
+        </div>
+
+        <button type="submit" id="ph-btn">Upload &amp; Deploy</button>
+      </form>
+      <div class="status" id="ph-status"></div>
     </div>
   </div>
 
@@ -392,6 +424,73 @@
           document.getElementById('papersForm').reset();
         } else {
           setStatus(statusEl, data.error || 'Failed. Please try again.', 'error');
+        }
+      } catch {
+        setStatus(statusEl, 'Network error. Please try again.', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // ── Photos ──
+    const photoDropZone = document.getElementById('photoDropZone');
+    const photoFileInput = document.getElementById('ph-file');
+    const photoFileNameEl = document.getElementById('ph-fileName');
+
+    photoFileInput.addEventListener('change', () => {
+      photoFileNameEl.textContent = photoFileInput.files[0]?.name ?? '';
+    });
+
+    photoDropZone.addEventListener('dragover', (e) => { e.preventDefault(); photoDropZone.classList.add('drag-over'); });
+    photoDropZone.addEventListener('dragleave', () => photoDropZone.classList.remove('drag-over'));
+    photoDropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      photoDropZone.classList.remove('drag-over');
+      if (e.dataTransfer.files.length) {
+        photoFileInput.files = e.dataTransfer.files;
+        photoFileNameEl.textContent = e.dataTransfer.files[0].name;
+      }
+    });
+
+    document.getElementById('photoForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const statusEl = document.getElementById('ph-status');
+      const btn = document.getElementById('ph-btn');
+      const password = document.getElementById('ph-password').value;
+      const caption = document.getElementById('ph-caption').value.trim();
+      const file = photoFileInput.files[0];
+
+      if (!file) { setStatus(statusEl, 'Please select a photo.', 'error'); return; }
+      if (!file.type.startsWith('image/')) { setStatus(statusEl, 'Only image files are accepted.', 'error'); return; }
+      if (file.size > 4 * 1024 * 1024) { setStatus(statusEl, 'File too large (max 4 MB).', 'error'); return; }
+
+      btn.disabled = true;
+      setStatus(statusEl, 'Reading file…', 'loading');
+
+      try {
+        const fileBase64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result.split(',')[1]);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+
+        setStatus(statusEl, 'Uploading to GitHub…', 'loading');
+
+        const res = await fetch('/api/add-photo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password, caption, fileBase64, fileName: file.name }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          setStatus(statusEl, 'Photo uploaded! Vercel is now deploying…', 'success');
+          document.getElementById('photoForm').reset();
+          photoFileNameEl.textContent = '';
+        } else {
+          setStatus(statusEl, data.error || 'Upload failed. Please try again.', 'error');
         }
       } catch {
         setStatus(statusEl, 'Network error. Please try again.', 'error');

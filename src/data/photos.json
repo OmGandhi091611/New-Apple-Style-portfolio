@@ -1,0 +1,18 @@
+[
+  { "id": "ipad-artwork", "src": "/photos/ipad-artwork.jpg", "caption": "Digital art — iPad & Apple Pencil" },
+  { "id": "friends-disneyland", "src": "/photos/friends-disneyland.jpg", "caption": "With friends" },
+  { "id": "friends-college", "src": "/photos/friends-college.jpg", "caption": "With friends, college days" },
+  { "id": "chicago-skyline-1", "src": "/photos/chicago-skyline-1.jpg", "caption": "Chicago skyline" },
+  { "id": "chicago-skyline-2", "src": "/photos/chicago-skyline-2.jpg", "caption": "Chicago skyline at dusk" },
+  { "id": "chicago-skyline-3", "src": "/photos/chicago-skyline-3.jpg", "caption": "Chicago skyline, dramatic sky" },
+  { "id": "buckingham-fountain", "src": "/photos/buckingham-fountain.jpg", "caption": "Buckingham Fountain, Chicago" },
+  { "id": "lake-horizon", "src": "/photos/lake-horizon.jpg", "caption": "Evening by the water" },
+  { "id": "city-sunset", "src": "/photos/city-sunset.jpg", "caption": "City sunset" },
+  { "id": "backyard-sunset", "src": "/photos/backyard-sunset.jpg", "caption": "Sunset from the backyard" },
+  { "id": "mountain-sunset", "src": "/photos/mountain-sunset.jpg", "caption": "Sunset over the hills" },
+  { "id": "sunny-afternoon", "src": "/photos/sunny-afternoon.jpg", "caption": "Sunny afternoon" },
+  { "id": "red-blossoms", "src": "/photos/red-blossoms.jpg", "caption": "Red blossoms in bloom" },
+  { "id": "looking-up", "src": "/photos/looking-up.jpg", "caption": "Looking up" },
+  { "id": "orion-1", "src": "/photos/orion-1.jpg", "caption": "Stargazing — Orion overhead" },
+  { "id": "orion-2", "src": "/photos/orion-2.jpg", "caption": "A clear night sky" }
+]

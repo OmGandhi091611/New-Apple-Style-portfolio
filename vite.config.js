@@ -16,5 +16,13 @@ export default defineConfig({
       '#constants': resolve(dirname(fileURLToPath(import.meta.url)), 'src/constants'),
       '#lib': resolve(dirname(fileURLToPath(import.meta.url)), 'src/lib'),
     }
-  }
+  },
+  build: {
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        photos: resolve(__dirname, 'photos.html'),
+      },
+    },
+  },
 })

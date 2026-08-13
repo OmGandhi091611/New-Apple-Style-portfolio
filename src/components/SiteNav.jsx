@@ -4,7 +4,7 @@ import { NAV_LINKS, SITE } from "#constants";
 import { useActiveSection } from "#lib/useActiveSection";
 import { smoothScrollTo } from "#lib/smoothScrollTo";
 
-const SECTION_IDS = NAV_LINKS.map((link) => link.id);
+const SECTION_IDS = NAV_LINKS.filter((link) => link.id).map((link) => link.id);
 
 export default function SiteNav() {
   const activeId = useActiveSection(SECTION_IDS);
@@ -23,6 +23,11 @@ export default function SiteNav() {
     smoothScrollTo(id);
   };
 
+  const linkClassName = (isActive) =>
+    isActive
+      ? "text-sm font-medium text-(--color-accent)"
+      : "text-sm text-(--color-ink-soft) hover:text-(--color-ink)";
+
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-(--color-line) bg-(--color-paper)/90 backdrop-blur">
@@ -36,24 +41,23 @@ export default function SiteNav() {
           </a>
 
           <ul className="hidden items-center gap-x-5 sm:flex">
-            {NAV_LINKS.map((link) => {
-              const isActive = link.id === activeId;
-              return (
-                <li key={link.id}>
+            {NAV_LINKS.map((link) => (
+              <li key={link.id ?? link.href}>
+                {link.href ? (
+                  <a href={link.href} className={linkClassName(false)}>
+                    {link.label}
+                  </a>
+                ) : (
                   <a
                     href={`#${link.id}`}
                     onClick={(e) => handleClick(e, link.id)}
-                    className={
-                      isActive
-                        ? "text-sm font-medium text-(--color-accent)"
-                        : "text-sm text-(--color-ink-soft) hover:text-(--color-ink)"
-                    }
+                    className={linkClassName(link.id === activeId)}
                   >
                     {link.label}
                   </a>
-                </li>
-              );
-            })}
+                )}
+              </li>
+            ))}
           </ul>
 
           <button
@@ -101,19 +105,26 @@ export default function SiteNav() {
 
         {NAV_LINKS.map((link, i) => {
           const isActive = link.id === activeId;
-          return (
+          const itemClassName = [
+            "py-1.5 text-sm transition-all duration-300",
+            menuOpen ? "translate-x-0 opacity-100" : "translate-x-4 opacity-0",
+            isActive
+              ? "font-medium text-(--color-accent)"
+              : "text-(--color-ink-soft) hover:text-(--color-ink)",
+          ].join(" ");
+          const style = { transitionDelay: menuOpen ? `${80 + i * 40}ms` : "0ms" };
+
+          return link.href ? (
+            <a key={link.href} href={link.href} style={style} className={itemClassName}>
+              {link.label}
+            </a>
+          ) : (
             <a
               key={link.id}
               href={`#${link.id}`}
               onClick={(e) => handleClick(e, link.id)}
-              style={{ transitionDelay: menuOpen ? `${80 + i * 40}ms` : "0ms" }}
-              className={[
-                "py-1.5 text-sm transition-all duration-300",
-                menuOpen ? "translate-x-0 opacity-100" : "translate-x-4 opacity-0",
-                isActive
-                  ? "font-medium text-(--color-accent)"
-                  : "text-(--color-ink-soft) hover:text-(--color-ink)",
-              ].join(" ")}
+              style={style}
+              className={itemClassName}
             >
               {link.label}
             </a>

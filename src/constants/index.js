@@ -1,5 +1,6 @@
 // src/constants/index.js
 import papersData from "../data/papers.json";
+import photosData from "../data/photos.json";
 
 export const SITE = {
   name: "Om Amit Gandhi",
@@ -21,10 +22,16 @@ export const NAV_LINKS = [
   { id: "experience", label: "Experience" },
   { id: "education", label: "Education" },
   { id: "cv", label: "CV" },
+  { id: "beyond", label: "Beyond Academia" },
+  { href: "/photos", label: "Photos" },
   { id: "contact", label: "Contact" },
 ];
 
-export const BIO = `I work on blockchain systems, distributed computing, and security — building performance-heavy systems (C/OpenMP, discrete-event simulators) and studying how they scale.
+// Populated via the admin panel's Photos tab (src/data/photos.json) — or
+// add files to public/photos/ and list them in that file manually.
+export const PHOTOS = photosData;
+
+export const BIO = `Hi, I am a second year PhD student. My Research is in blockchain systems, distributed computing, and security. I work on building performance-heavy systems (C/OpenMP, discrete-event simulators) and studying how they scale.
 
 My current research centers on sharded blockchain architectures, GPU-accelerated consensus, and simulation-based performance evaluation of distributed systems.`;
 
@@ -97,6 +104,17 @@ export const EXPERIENCE = [
       "Contributed to a team-based e-commerce bookstore application; implemented role-based UI workflows with TypeScript, PostgreSQL, and .NET.",
     tags: ["TypeScript", "PostgreSQL", ".NET"],
   },
+];
+
+// Placeholder — swap these for your actual interests.
+export const BEYOND_ACADEMIA = [
+  "I am currently watching too much anime, Naruto, Attack on Titan, One Piece, etc. In short all the anime live rent free in my head.",
+  "I love clicking pictures of naturistic views, you can find some of them here or my instagram highlights.",
+  "I am a big fan of sci-fi novels and technology.",
+  "I enjoy playing GTA V and Call of Duty in my free time and mostly you would find me watching a classic Indian show C.I.D.",
+  "Chai over coffee, always. If anyone who prefers coffee, I am fine, just don't ask me to even taste it.",
+  "I am trying to learn new recipes and also how to play a guitar.",
+  "I am also. trying to stay consistent with my gym routine.",
 ];
 
 export const EDUCATION = [
