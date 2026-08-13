@@ -1,11 +1,11 @@
-// src/components/ContactApp.jsx
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import emailjs from "@emailjs/browser";
+import { SITE } from "#constants";
+import Reveal from "./Reveal";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function canSendNow() {
-  // Simple client-side rate limit: 1 send per 20 seconds
   const key = "contact:lastSendAt";
   const last = Number(localStorage.getItem(key) || 0);
   const now = Date.now();
@@ -14,19 +14,16 @@ function canSendNow() {
   return { ok: true, waitMs: 0 };
 }
 
-export default function ContactApp({ onClose }) {
+export default function Contact() {
   const [form, setForm] = useState({
     name: "",
     email: "",
     subject: "",
     message: "",
-    botcheck: "", // honeypot
+    botcheck: "",
   });
 
-  const [status, setStatus] = useState({
-    state: "idle", // idle | sending | success | error
-    error: "",
-  });
+  const [status, setStatus] = useState({ state: "idle", error: "" });
 
   const errors = useMemo(() => {
     const e = {};
@@ -48,19 +45,13 @@ export default function ContactApp({ onClose }) {
     if (status.state !== "idle") setStatus({ state: "idle", error: "" });
   };
 
-  const reset = () => {
-    setForm({ name: "", email: "", subject: "", message: "", botcheck: "" });
-    setStatus({ state: "idle", error: "" });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!canSend) return;
 
-    // Honeypot triggered (bots)
     if (form.botcheck) {
       setStatus({ state: "success", error: "" });
-      reset();
+      setForm({ name: "", email: "", subject: "", message: "", botcheck: "" });
       return;
     }
 
@@ -90,7 +81,6 @@ export default function ContactApp({ onClose }) {
     setStatus({ state: "sending", error: "" });
 
     try {
-      // Template parameters (match your EmailJS template variables)
       const templateParams = {
         from_name: form.name.trim(),
         reply_to: form.email.trim(),
@@ -114,102 +104,79 @@ export default function ContactApp({ onClose }) {
   };
 
   return (
-    <div className="h-full w-full">
-      <div className="h-full w-full rounded-xl border border-white/10 bg-black/30 backdrop-blur-xl p-4 flex flex-col min-h-0">
-        {/* Header */}
-        <div className="mb-3 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-          <div className="min-w-0">
-            <div className="text-lg font-semibold text-white/90">Contact</div>
-            <div className="text-xs text-white/60">Send me a message — it comes straight to my inbox.</div>
-          </div>
+    <Reveal id="contact">
+      <h2 className="section-heading">Contact</h2>
+      <p className="mb-6 text-sm text-(--color-ink-soft)">
+        Reach me directly at{" "}
+        <a href={`mailto:${SITE.email}`} className="link-accent">
+          {SITE.email}
+        </a>
+        , or send a message below.
+      </p>
 
-          <div className="flex flex-wrap items-center justify-end gap-2 max-w-full">
-            {onClose && (
-              <button
-                onClick={onClose}
-                className="shrink-0 rounded-lg border border-white/10 bg-white/10 px-3 py-1.5 text-xs text-white/80 hover:bg-white/15"
-                type="button"
-              >
-                Close
-              </button>
-            )}
-          </div>
+      {status.state === "success" && (
+        <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+          Sent — thanks! I&apos;ll reply soon.
+        </div>
+      )}
+      {status.state === "error" && (
+        <div className="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-800">
+          {status.error}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="grid gap-4">
+        <input
+          type="text"
+          name="botcheck"
+          tabIndex={-1}
+          autoComplete="off"
+          className="hidden"
+          value={form.botcheck}
+          onChange={setField("botcheck")}
+        />
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Name" placeholder="Your name" value={form.name} onChange={setField("name")} error={errors.name} />
+          <Field label="Email" placeholder="you@example.com" value={form.email} onChange={setField("email")} error={errors.email} />
         </div>
 
-        {status.state === "success" && (
-          <div className="mb-3 rounded-lg border border-emerald-400/15 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">
-            Sent — thanks! I’ll reply soon.
-          </div>
-        )}
-        {status.state === "error" && (
-          <div className="mb-3 rounded-lg border border-rose-400/15 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
-            {status.error}
-          </div>
-        )}
+        <Field label="Subject" placeholder="Collaboration / Question" value={form.subject} onChange={setField("subject")} error={errors.subject} />
+        <Field label="Message" placeholder="Write your message here…" value={form.message} onChange={setField("message")} error={errors.message} textarea />
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="grid gap-3 flex-1 min-h-0 overflow-y-auto pr-1">
-          {/* Honeypot field (hidden) */}
-          <input
-            type="text"
-            name="botcheck"
-            tabIndex={-1}
-            autoComplete="off"
-            className="hidden"
-            value={form.botcheck}
-            onChange={setField("botcheck")}
-          />
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Field label="Your name" placeholder="Om Gandhi" value={form.name} onChange={setField("name")} error={errors.name} />
-            <Field label="Your email" placeholder="you@example.com" value={form.email} onChange={setField("email")} error={errors.email} />
-          </div>
-
-          <Field label="Subject" placeholder="Internship / Collaboration / Question" value={form.subject} onChange={setField("subject")} error={errors.subject} />
-
-          <Field label="Message" placeholder="Write your message here…" value={form.message} onChange={setField("message")} error={errors.message} textarea />
-
-          <div className="mt-1 flex items-center justify-end gap-2">
-            <button
-              type="button"
-              onClick={reset}
-              className="rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-xs text-white/80 hover:bg-white/15"
-            >
-              Reset
-            </button>
-
-            <button
-              type="submit"
-              disabled={!canSend}
-              className={[
-                "rounded-lg px-4 py-2 text-xs font-medium border border-white/10",
-                canSend ? "bg-white/20 text-white hover:bg-white/25" : "bg-white/5 text-white/40 cursor-not-allowed",
-              ].join(" ")}
-            >
-              {status.state === "sending" ? "Sending…" : "Send"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div className="mt-1 flex justify-end">
+          <button
+            type="submit"
+            disabled={!canSend}
+            className={[
+              "rounded-md px-4 py-2 text-sm font-medium transition-colors",
+              canSend
+                ? "bg-(--color-ink) text-(--color-paper) hover:bg-(--color-ink-soft)"
+                : "cursor-not-allowed bg-(--color-line) text-(--color-ink-faint)",
+            ].join(" ")}
+          >
+            {status.state === "sending" ? "Sending…" : "Send message"}
+          </button>
+        </div>
+      </form>
+    </Reveal>
   );
 }
 
 function Field({ label, error, textarea = false, ...props }) {
   const Base = textarea ? "textarea" : "input";
   return (
-    <label className="grid gap-1">
-      <span className="text-[11px] text-white/70">{label}</span>
+    <label className="grid gap-1.5">
+      <span className="text-xs font-medium text-(--color-ink-soft)">{label}</span>
       <Base
         {...props}
         className={[
-          "w-full rounded-xl border px-3 py-2 text-sm text-white/90",
-          "border-white/10 bg-white/5 outline-none placeholder:text-white/35",
-          "focus:border-white/25 focus:bg-white/10",
-          textarea ? "min-h-[140px] resize-none" : "",
+          "w-full rounded-md border border-(--color-line) bg-(--color-paper) px-3 py-2 text-sm text-(--color-ink) outline-none",
+          "placeholder:text-(--color-ink-faint) focus:border-(--color-ink-soft)",
+          textarea ? "min-h-[120px] resize-none" : "",
         ].join(" ")}
       />
-      <span className="min-h-[14px] text-[11px] text-rose-300/90">{error || ""}</span>
+      <span className="min-h-[14px] text-xs text-rose-600">{error || ""}</span>
     </label>
   );
 }

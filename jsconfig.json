@@ -6,13 +6,7 @@
             "#constants": ["./src/constants"],
             "#constants/*": ["./src/constants/*"],
             "#lib": ["./src/lib"],
-            "#lib/*": ["./src/lib/*"],
-            "#store": ["./src/store"],
-            "#store/*": ["./src/store/*"],
-            "#hoc": ["./src/hoc"],
-            "#hoc/*": ["./src/hoc/*"],
-            "#windows": ["./src/windows"],
-            "#windows/*": ["./src/windows/*"]
+            "#lib/*": ["./src/lib/*"]
         }
     },
     "include": ["src"]

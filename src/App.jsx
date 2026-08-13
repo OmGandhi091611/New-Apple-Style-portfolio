@@ -1,29 +1,29 @@
-import { Navbar } from "#components";
-import DesktopShell from "#components/DesktopShell";
-import IntroGlass from "#components/IntroGlass";
-import React from "react";
+import {
+  SiteNav,
+  Hero,
+  About,
+  Publications,
+  Projects,
+  Experience,
+  Education,
+  CV,
+  Contact,
+  Footer,
+} from "#components";
 
 const App = () => {
   return (
-    <main className="relative min-h-dvh">
-      <IntroGlass
-        title="Hi, I’m Om Gandhi"
-        subtitle="PhD in Computer Science • Blockchain • Distributed Systems • Security"
-        durationMs={7000}
-      />
-
-      <Navbar />
-      <DesktopShell />
-
-      {/* ✅ Brightness overlay (web-safe “device brightness” simulation)
-          Put it BELOW ControlCenter (z 80/90), ABOVE page (z < 70). */}
-      <div
-        className="pointer-events-none fixed inset-0 z-[60]"
-        style={{
-          background: "black",
-          opacity: `calc(1 - var(--ui-brightness, 1))`,
-        }}
-      />
+    <main className="min-h-dvh">
+      <SiteNav />
+      <Hero />
+      <About />
+      <Publications />
+      <Projects />
+      <Experience />
+      <Education />
+      <CV />
+      <Contact />
+      <Footer />
     </main>
   );
 };

@@ -1,9 +1,43 @@
 [
   {
+    "id": "evaluating_winner_based_sharded_blockchain_architecture",
+    "type": "item",
+    "name": "Evaluating a Winner-Based Sharded Blockchain Architecture Through Large-Scale Simulation",
+    "subtitle": "Under review at IEEE/ACM Big Data 2026",
+    "authors": ["Om Amit Gandhi", "Ioan Raicu"],
+    "tags": ["Blockchain", "Sharding", "Under Review"],
+    "action": { "kind": "noop" }
+  },
+  {
+    "id": "simulation_based_performance_evaluation_poster_gcasr",
+    "type": "item",
+    "name": "Simulation-Based Performance Evaluation of Sharded Blockchain Architectures",
+    "subtitle": "Poster presentation, GCASR 2026",
+    "authors": ["Om Amit Gandhi", "Ioan Raicu"],
+    "tags": ["Poster", "GCASR", "Blockchain"],
+    "action": {
+      "kind": "link",
+      "href": "https://gcasr.org/2026/pdfs/posters/Gandhi_OmAmit_Simulation-BasedPerformanceEvaluationofShardedBlockchainArchitectures%20-%20Om%20Amit%20Gandhi.pdf"
+    }
+  },
+  {
+    "id": "shards_on_a_shoestring_poster_gcasr",
+    "type": "item",
+    "name": "Shards on a Shoestring: Putting Blockchain Sharding Simulations to the Test",
+    "subtitle": "Poster presentation, GCASR 2026",
+    "authors": ["Sohini Sahukar", "Om Amit Gandhi", "Ioan Raicu"],
+    "tags": ["Poster", "GCASR", "Blockchain"],
+    "action": {
+      "kind": "link",
+      "href": "https://gcasr.org/2026/pdfs/posters/Sahukar_Sohini_ShardsOnAShoestring%20-%20Sohini%20Sahukar.pdf"
+    }
+  },
+  {
     "id": "simulation_based_performance_evaluation_of_sharded_blockchain_architectures",
     "type": "item",
     "name": "Simulation-Based Performance Evaluation of Sharded Blockchain Architectures",
-    "subtitle": "About Sharding architectures and how they scale",
+    "subtitle": "arXiv preprint",
+    "authors": ["Om Amit Gandhi", "Ioan Raicu"],
     "tags": [
       "Blockchain",
       "Scalability",
@@ -18,7 +52,8 @@
     "id": "vaultxgpu_gpu_accelerated_blockchain_consensus",
     "type": "item",
     "name": "VaultxGPU: GPU-Accelerated Blockchain Consensus",
-    "subtitle": "GPU performance for Proof of space consensus",
+    "subtitle": "arXiv preprint",
+    "authors": ["Samuel Taiwo Fatunmbi", "Om Amit Gandhi", "Luke Logan"],
     "tags": [
       "Blockchain",
       "Scalability",
