@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, Moon, Sun, X } from "lucide-react";
 import { NAV_LINKS, SITE } from "#constants";
 import { useActiveSection } from "#lib/useActiveSection";
 import { smoothScrollTo } from "#lib/smoothScrollTo";
+import { useTheme } from "#lib/theme";
 
 const SECTION_IDS = NAV_LINKS.filter((link) => link.id).map((link) => link.id);
 
 export default function SiteNav() {
   const activeId = useActiveSection(SECTION_IDS);
+  const { theme, toggleTheme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -60,14 +62,25 @@ export default function SiteNav() {
             ))}
           </ul>
 
-          <button
-            type="button"
-            onClick={() => setMenuOpen(true)}
-            aria-label="Open menu"
-            className="text-(--color-ink-soft) hover:text-(--color-ink) lg:hidden"
-          >
-            <Menu size={20} />
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              className="text-(--color-ink-soft) hover:text-(--color-ink)"
+            >
+              {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setMenuOpen(true)}
+              aria-label="Open menu"
+              className="text-(--color-ink-soft) hover:text-(--color-ink) lg:hidden"
+            >
+              <Menu size={20} />
+            </button>
+          </div>
         </nav>
       </header>
 

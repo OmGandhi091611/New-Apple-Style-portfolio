@@ -29,6 +29,52 @@ body {
   --color-ink-faint: #8a8a83;
   --color-line: #e4e3de;
   --color-accent: #8a3b12;
+
+  --color-success-bg: #ecfdf5;
+  --color-success-text: #065f46;
+  --color-success-border: #a7f3d0;
+  --color-error-bg: #fef2f2;
+  --color-error-text: #991b1b;
+  --color-error-border: #fecaca;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-paper: #1f1f23;
+    --color-ink: #f2f1ee;
+    --color-ink-soft: #b6b4ac;
+    --color-ink-faint: #82807a;
+    --color-line: #333230;
+    --color-accent: #e08a52;
+
+    --color-success-bg: #062e22;
+    --color-success-text: #6ee7b7;
+    --color-success-border: #0f4a37;
+    --color-error-bg: #3a1212;
+    --color-error-text: #fca5a5;
+    --color-error-border: #5c1d1d;
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-paper: #18181b;
+  --color-ink: #f2f1ee;
+  --color-ink-soft: #b6b4ac;
+  --color-ink-faint: #82807a;
+  --color-line: #333230;
+  --color-accent: #e08a52;
+
+  --color-success-bg: #062e22;
+  --color-success-text: #6ee7b7;
+  --color-success-border: #0f4a37;
+  --color-error-bg: #3a1212;
+  --color-error-text: #fca5a5;
+  --color-error-border: #5c1d1d;
+}
+
+html,
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 @utility flex-center {

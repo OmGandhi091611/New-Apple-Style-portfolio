@@ -115,12 +115,12 @@ export default function Contact() {
       </p>
 
       {status.state === "success" && (
-        <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+        <div className="mb-4 rounded-lg border border-(--color-success-border) bg-(--color-success-bg) px-3 py-2 text-sm text-(--color-success-text)">
           Sent — thanks! I&apos;ll reply soon.
         </div>
       )}
       {status.state === "error" && (
-        <div className="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-800">
+        <div className="mb-4 rounded-lg border border-(--color-error-border) bg-(--color-error-bg) px-3 py-2 text-sm text-(--color-error-text)">
           {status.error}
         </div>
       )}
@@ -176,7 +176,7 @@ function Field({ label, error, textarea = false, ...props }) {
           textarea ? "min-h-[120px] resize-none" : "",
         ].join(" ")}
       />
-      <span className="min-h-[14px] text-xs text-rose-600">{error || ""}</span>
+      <span className="min-h-[14px] text-xs text-(--color-error-text)">{error || ""}</span>
     </label>
   );
 }

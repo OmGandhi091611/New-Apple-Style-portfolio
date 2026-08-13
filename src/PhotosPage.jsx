@@ -1,7 +1,11 @@
+import { Moon, Sun } from "lucide-react";
 import { SITE, PHOTOS } from "#constants";
 import { Footer } from "#components";
+import { useTheme } from "#lib/theme";
 
 export default function PhotosPage() {
+  const { theme, toggleTheme } = useTheme();
+
   return (
     <main className="min-h-dvh">
       <header className="border-b border-(--color-line)">
@@ -9,9 +13,19 @@ export default function PhotosPage() {
           <a href="/" className="text-sm font-semibold text-(--color-ink)">
             {SITE.name}
           </a>
-          <a href="/" className="text-sm text-(--color-ink-soft) hover:text-(--color-ink)">
-            ← Back to site
-          </a>
+          <div className="flex items-center gap-4">
+            <a href="/" className="text-sm text-(--color-ink-soft) hover:text-(--color-ink)">
+              ← Back to site
+            </a>
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              className="text-(--color-ink-soft) hover:text-(--color-ink)"
+            >
+              {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+          </div>
         </div>
       </header>
 
