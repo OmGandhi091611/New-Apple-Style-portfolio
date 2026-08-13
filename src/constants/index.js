@@ -74,8 +74,8 @@ export const EXPERIENCE = [
     org: "Illinois Institute of Technology",
     period: "Aug 2025 – Present",
     description:
-      "Research in blockchain sharding and distributed systems. Designing a discrete-event blockchain simulator to compare sharded and non-sharded architectures under configurable workloads and network conditions, modeling protocol mechanisms (fee markets, reward halving, difficulty adjustment), and running reproducible evaluation workflows for ongoing publications.",
-    tags: ["Research", "Blockchain", "Distributed Systems"],
+      "I research distributed systems, parallel computing, blockchain sharding, and networking and security. I'm designing a discrete-event blockchain simulator to compare sharded and non-sharded architectures under configurable workloads and network conditions, modeling protocol mechanisms (fee markets, reward halving, difficulty adjustment), and running reproducible evaluation workflows for ongoing publications.",
+    tags: ["Research", "Distributed Systems", "Parallel Computing", "Blockchain Systems", "Networking and Security"],
   },
   {
     id: "ta",
