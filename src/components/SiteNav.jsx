@@ -25,22 +25,22 @@ export default function SiteNav() {
 
   const linkClassName = (isActive) =>
     isActive
-      ? "text-sm font-medium text-(--color-accent)"
-      : "text-sm text-(--color-ink-soft) hover:text-(--color-ink)";
+      ? "text-sm font-medium whitespace-nowrap text-(--color-accent)"
+      : "text-sm whitespace-nowrap text-(--color-ink-soft) hover:text-(--color-ink)";
 
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-(--color-line) bg-(--color-paper)/90 backdrop-blur">
-        <nav className="mx-auto flex w-full max-w-3xl items-center justify-between px-6 py-4">
+        <nav className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-4 sm:px-10">
           <a
             href="#top"
             onClick={(e) => handleClick(e, "top")}
-            className="text-sm font-semibold text-(--color-ink)"
+            className="shrink-0 text-sm font-semibold whitespace-nowrap text-(--color-ink)"
           >
             {SITE.name}
           </a>
 
-          <ul className="hidden items-center gap-x-5 sm:flex">
+          <ul className="hidden items-center gap-x-7 lg:flex">
             {NAV_LINKS.map((link) => (
               <li key={link.id ?? link.href}>
                 {link.href ? (
@@ -64,7 +64,7 @@ export default function SiteNav() {
             type="button"
             onClick={() => setMenuOpen(true)}
             aria-label="Open menu"
-            className="text-(--color-ink-soft) hover:text-(--color-ink) sm:hidden"
+            className="text-(--color-ink-soft) hover:text-(--color-ink) lg:hidden"
           >
             <Menu size={20} />
           </button>
@@ -76,7 +76,7 @@ export default function SiteNav() {
         onClick={() => setMenuOpen(false)}
         aria-hidden="true"
         className={[
-          "fixed inset-0 z-40 bg-black/20 transition-opacity duration-300 sm:hidden",
+          "fixed inset-0 z-40 bg-black/20 transition-opacity duration-300 lg:hidden",
           menuOpen ? "opacity-100" : "pointer-events-none opacity-0",
         ].join(" ")}
       />
@@ -87,7 +87,7 @@ export default function SiteNav() {
         aria-modal="true"
         aria-label="Site menu"
         className={[
-          "fixed inset-y-0 right-0 z-50 flex w-64 flex-col bg-(--color-paper) px-6 py-5 shadow-xl transition-transform duration-300 ease-out sm:hidden",
+          "fixed inset-y-0 right-0 z-50 flex w-64 flex-col bg-(--color-paper) px-6 py-5 shadow-xl transition-transform duration-300 ease-out lg:hidden",
           menuOpen ? "translate-x-0" : "translate-x-full",
         ].join(" ")}
       >
