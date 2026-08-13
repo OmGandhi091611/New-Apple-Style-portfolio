@@ -6,7 +6,7 @@ export const SITE = {
   name: "Om Amit Gandhi",
   tagline: "PhD Student, Computer Science",
   affiliation: "Illinois Institute of Technology",
-  focus: "Blockchain Systems · Distributed Computing · Security",
+  focus: "Distributed Systems · Parallel Computing · Blockchain Systems · Networking and Security",
   email: "ogandhi1@hawk.illinoistech.edu",
   github: "https://github.com/OmGandhi091611",
   linkedin: "https://www.linkedin.com/in/omgandhi1611/",
@@ -31,14 +31,14 @@ export const NAV_LINKS = [
 // add files to public/photos/ and list them in that file manually.
 export const PHOTOS = photosData;
 
-export const BIO = `Hi, I am a second year PhD student. My Research is in blockchain systems, distributed computing, and security. I work on building performance-heavy systems (C/OpenMP, discrete-event simulators) and studying how they scale.
+export const BIO = `Hi, I am a second year PhD student. My Research is in distributed systems, parallel computing, blockchain systems, and networking and security. I work on building performance-heavy systems (C/OpenMP, discrete-event simulators) and studying how they scale.
 
 My current research centers on sharded blockchain architectures, GPU-accelerated consensus, and simulation-based performance evaluation of distributed systems.`;
 
 export const SKILLS = {
   Languages: ["C/C++", "Python", "JavaScript/TypeScript", "Java"],
   "Frameworks & Tools": ["React", "Vite", "Tailwind CSS", "SimPy", "OpenMP"],
-  Interests: ["Blockchain", "Distributed Systems", "Security", "AI"],
+  Interests: ["Distributed Systems", "Parallel Computing", "Blockchain Systems", "Networking and Security"],
 };
 
 export const PUBLICATIONS = papersData.map((p) => ({
