@@ -14,7 +14,13 @@ export default function Hero() {
             {SITE.name}
           </h1>
           <p className="mt-2 text-lg text-(--color-ink-soft)">{SITE.tagline}</p>
-          <p className="mt-1 text-sm text-(--color-ink-faint)">{SITE.focus}</p>
+          <p className="mt-1 text-sm text-(--color-ink-faint)">
+            {SITE.focus.map((item) => (
+              <span key={item} className="block">
+                {item}
+              </span>
+            ))}
+          </p>
         </div>
 
         <img

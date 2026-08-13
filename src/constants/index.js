@@ -6,7 +6,12 @@ export const SITE = {
   name: "Om Amit Gandhi",
   tagline: "PhD Student, Computer Science",
   affiliation: "Illinois Institute of Technology",
-  focus: "Distributed Systems · Parallel Computing · Blockchain Systems · Networking and Security",
+  focus: [
+    "Distributed Systems",
+    "Parallel Computing",
+    "Blockchain Systems",
+    "Networking and Security",
+  ],
   email: "ogandhi1@hawk.illinoistech.edu",
   github: "https://github.com/OmGandhi091611",
   linkedin: "https://www.linkedin.com/in/omgandhi1611/",
