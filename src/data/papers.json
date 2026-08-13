@@ -21,18 +21,6 @@
     }
   },
   {
-    "id": "shards_on_a_shoestring_poster_gcasr",
-    "type": "item",
-    "name": "Shards on a Shoestring: Putting Blockchain Sharding Simulations to the Test",
-    "subtitle": "Poster presentation, GCASR 2026",
-    "authors": ["Sohini Sahukar", "Om Amit Gandhi", "Ioan Raicu"],
-    "tags": ["Poster", "GCASR", "Blockchain"],
-    "action": {
-      "kind": "link",
-      "href": "https://gcasr.org/2026/pdfs/posters/Sahukar_Sohini_ShardsOnAShoestring%20-%20Sohini%20Sahukar.pdf"
-    }
-  },
-  {
     "id": "simulation_based_performance_evaluation_of_sharded_blockchain_architectures",
     "type": "item",
     "name": "Simulation-Based Performance Evaluation of Sharded Blockchain Architectures",
@@ -46,6 +34,18 @@
     "action": {
       "kind": "link",
       "href": "https://arxiv.org/abs/2606.14394"
+    }
+  },
+  {
+    "id": "shards_on_a_shoestring_poster_gcasr",
+    "type": "item",
+    "name": "Shards on a Shoestring: Putting Blockchain Sharding Simulations to the Test",
+    "subtitle": "Poster presentation, GCASR 2026",
+    "authors": ["Sohini Sahukar", "Om Amit Gandhi", "Ioan Raicu"],
+    "tags": ["Poster", "GCASR", "Blockchain"],
+    "action": {
+      "kind": "link",
+      "href": "https://gcasr.org/2026/pdfs/posters/Sahukar_Sohini_ShardsOnAShoestring%20-%20Sohini%20Sahukar.pdf"
     }
   },
   {
