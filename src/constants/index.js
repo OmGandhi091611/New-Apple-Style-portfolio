@@ -83,6 +83,15 @@ export const EXPERIENCE = [
     tags: ["Research", "Distributed Systems", "Parallel Computing", "Blockchain Systems", "Networking and Security"],
   },
   {
+    id: "ta_cs350_cs528",
+    role: "Teaching Assistant — CS350 & CS528",
+    org: "Illinois Institute of Technology",
+    period: "Aug 2026 – Present",
+    description:
+      "Office hours, grading, and student support; coordinated with instructors and TA teams to standardize grading practices and course communication.",
+    tags: ["Teaching"],
+  },
+  {
     id: "ta",
     role: "Teaching Assistant — CS458 (Introduction to Information Security)",
     org: "Illinois Institute of Technology",
