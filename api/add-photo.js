@@ -24,6 +24,7 @@ export default async function handler(req, res) {
   const owner = process.env.GITHUB_OWNER;
   const repo = process.env.GITHUB_REPO;
   const token = process.env.GITHUB_TOKEN;
+  const branch = process.env.GITHUB_BRANCH || 'academic-portfolio';
 
   if (!owner || !repo || !token) {
     return res.status(500).json({ error: 'Server misconfigured — missing GitHub env vars' });
@@ -51,6 +52,7 @@ export default async function handler(req, res) {
     body: JSON.stringify({
       message: `chore: add photo "${uniqueName}"`,
       content: fileBase64,
+      branch,
     }),
   });
 
@@ -63,7 +65,7 @@ export default async function handler(req, res) {
   const dataPath = 'src/data/photos.json';
   const dataApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${dataPath}`;
 
-  const getRes = await fetch(dataApiUrl, { headers });
+  const getRes = await fetch(`${dataApiUrl}?ref=${branch}`, { headers });
   let photos = [];
   let sha;
 
@@ -89,6 +91,7 @@ export default async function handler(req, res) {
     body: JSON.stringify({
       message: `chore: add photo entry "${uniqueName}"`,
       content: updatedContent,
+      branch,
       ...(sha ? { sha } : {}),
     }),
   });

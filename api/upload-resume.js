@@ -24,6 +24,7 @@ export default async function handler(req, res) {
   const owner = process.env.GITHUB_OWNER;
   const repo = process.env.GITHUB_REPO;
   const token = process.env.GITHUB_TOKEN;
+  const branch = process.env.GITHUB_BRANCH || 'academic-portfolio';
   const filePath = 'public/Om_Amit_Gandhi_Resume.pdf';
 
   if (!owner || !repo || !token) {
@@ -40,7 +41,7 @@ export default async function handler(req, res) {
   };
 
   // Fetch current file SHA (required by GitHub API to update an existing file)
-  const getRes = await fetch(apiUrl, { headers });
+  const getRes = await fetch(`${apiUrl}?ref=${branch}`, { headers });
   let sha;
   if (getRes.ok) {
     const data = await getRes.json();
@@ -56,6 +57,7 @@ export default async function handler(req, res) {
     body: JSON.stringify({
       message: 'chore: update resume PDF',
       content: fileBase64,
+      branch,
       ...(sha ? { sha } : {}),
     }),
   });

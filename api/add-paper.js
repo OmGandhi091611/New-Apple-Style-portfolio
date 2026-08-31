@@ -24,6 +24,7 @@ export default async function handler(req, res) {
   const owner = process.env.GITHUB_OWNER;
   const repo = process.env.GITHUB_REPO;
   const token = process.env.GITHUB_TOKEN;
+  const branch = process.env.GITHUB_BRANCH || 'academic-portfolio';
   const filePath = 'src/data/papers.json';
 
   if (!owner || !repo || !token) {
@@ -40,7 +41,7 @@ export default async function handler(req, res) {
   };
 
   // Read the current papers.json from GitHub
-  const getRes = await fetch(apiUrl, { headers });
+  const getRes = await fetch(`${apiUrl}?ref=${branch}`, { headers });
 
   let papers = [];
   let sha;
@@ -84,6 +85,7 @@ export default async function handler(req, res) {
     body: JSON.stringify({
       message: `chore: ${verb} paper "${entry.name}"`,
       content: updatedContent,
+      branch,
       ...(sha ? { sha } : {}),
     }),
   });
