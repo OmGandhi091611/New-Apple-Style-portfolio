@@ -216,6 +216,7 @@
 
     <div class="tabs">
       <button class="tab-btn active" data-tab="resume">Resume</button>
+      <button class="tab-btn" data-tab="cv">CV</button>
       <button class="tab-btn" data-tab="papers">Papers</button>
       <button class="tab-btn" data-tab="photos">Photos</button>
     </div>
@@ -239,6 +240,27 @@
         <button type="submit" id="r-btn">Upload &amp; Deploy</button>
       </form>
       <div class="status" id="r-status"></div>
+    </div>
+
+    <!-- ── CV Tab ── -->
+    <div class="panel" id="panel-cv">
+      <form id="cvForm">
+        <div class="field">
+          <label>Admin Password</label>
+          <input type="password" id="c-password" placeholder="••••••••" required autocomplete="current-password" />
+        </div>
+        <div class="field">
+          <label>CV PDF</label>
+          <div class="file-drop" id="cvDropZone">
+            <input type="file" id="c-file" accept=".pdf" required />
+            <div class="drop-icon">📄</div>
+            <div class="drop-text">Click to browse or drag & drop</div>
+            <div class="drop-name" id="c-fileName"></div>
+          </div>
+        </div>
+        <button type="submit" id="c-btn">Upload &amp; Deploy</button>
+      </form>
+      <div class="status" id="c-status"></div>
     </div>
 
     <!-- ── Papers Tab ── -->
@@ -382,6 +404,72 @@
           setStatus(statusEl, 'Resume uploaded! Vercel is now deploying…', 'success');
           document.getElementById('resumeForm').reset();
           fileNameEl.textContent = '';
+        } else {
+          setStatus(statusEl, data.error || 'Upload failed. Please try again.', 'error');
+        }
+      } catch {
+        setStatus(statusEl, 'Network error. Please try again.', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // ── CV upload ──
+    const cvDropZone = document.getElementById('cvDropZone');
+    const cvFileInput = document.getElementById('c-file');
+    const cvFileNameEl = document.getElementById('c-fileName');
+
+    cvFileInput.addEventListener('change', () => {
+      cvFileNameEl.textContent = cvFileInput.files[0]?.name ?? '';
+    });
+
+    cvDropZone.addEventListener('dragover', (e) => { e.preventDefault(); cvDropZone.classList.add('drag-over'); });
+    cvDropZone.addEventListener('dragleave', () => cvDropZone.classList.remove('drag-over'));
+    cvDropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      cvDropZone.classList.remove('drag-over');
+      if (e.dataTransfer.files.length) {
+        cvFileInput.files = e.dataTransfer.files;
+        cvFileNameEl.textContent = e.dataTransfer.files[0].name;
+      }
+    });
+
+    document.getElementById('cvForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const statusEl = document.getElementById('c-status');
+      const btn = document.getElementById('c-btn');
+      const password = document.getElementById('c-password').value;
+      const file = cvFileInput.files[0];
+
+      if (!file) { setStatus(statusEl, 'Please select a PDF file.', 'error'); return; }
+      if (file.type !== 'application/pdf') { setStatus(statusEl, 'Only PDF files are accepted.', 'error'); return; }
+      if (file.size > 4 * 1024 * 1024) { setStatus(statusEl, 'File too large (max 4 MB).', 'error'); return; }
+
+      btn.disabled = true;
+      setStatus(statusEl, 'Reading file…', 'loading');
+
+      try {
+        const fileBase64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result.split(',')[1]);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+
+        setStatus(statusEl, 'Uploading to GitHub…', 'loading');
+
+        const res = await fetch('/api/upload-cv', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password, fileBase64 }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          setStatus(statusEl, 'CV uploaded! Vercel is now deploying…', 'success');
+          document.getElementById('cvForm').reset();
+          cvFileNameEl.textContent = '';
         } else {
           setStatus(statusEl, data.error || 'Upload failed. Please try again.', 'error');
         }
