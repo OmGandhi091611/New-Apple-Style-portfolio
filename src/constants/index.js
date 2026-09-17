@@ -75,7 +75,7 @@ export const PROJECTS = [
 export const EXPERIENCE = [
   {
     id: "research",
-    role: "Research Assistant",
+    role: "Graduate Student Researcher",
     org: "Illinois Institute of Technology",
     period: "May 2025 – Present",
     description:
@@ -84,7 +84,7 @@ export const EXPERIENCE = [
   },
   {
     id: "ta_cs350_cs528",
-    role: "Teaching Assistant — CS350 & CS528",
+    role: "Graduate Teaching Assistant — CS350 & CS528",
     org: "Illinois Institute of Technology",
     period: "Aug 2026 – Present",
     description:
@@ -93,7 +93,7 @@ export const EXPERIENCE = [
   },
   {
     id: "ta",
-    role: "Teaching Assistant — CS458 (Introduction to Information Security)",
+    role: "Graduate Teaching Assistant — CS458 (Introduction to Information Security)",
     org: "Illinois Institute of Technology",
     period: "Aug 2025 – May 2026",
     description:
